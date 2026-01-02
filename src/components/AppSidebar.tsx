@@ -1,4 +1,4 @@
-import { Heart, Home, Receipt, TrendingUp, Settings, LogOut, Sun, Moon } from "lucide-react";
+import { Heart, Home, Receipt, TrendingUp, Calendar, Users, Sun, Moon, LogOut } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useAuth } from "@/hooks/useAuth";
 import {
@@ -15,11 +15,20 @@ import {
 import { Button } from "@/components/ui/button";
 
 const menuItems = [
-  { title: "Visão Geral", icon: TrendingUp, id: "overview" },
+  { title: "Visão Geral", icon: TrendingUp, id: "viability" },
+  { title: "Perfil do Casal", icon: Users, id: "couple-profile" },
   { title: "Casamento", icon: Heart, id: "wedding" },
   { title: "Moradia", icon: Home, id: "housing" },
   { title: "Custos Mensais", icon: Receipt, id: "recurring" },
+  { title: "Projeção", icon: Calendar, id: "projection" },
 ];
+
+const scrollToSection = (id: string) => {
+  const element = document.getElementById(id);
+  if (element) {
+    element.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+};
 
 export function AppSidebar() {
   const { signOut, user } = useAuth();
@@ -37,7 +46,10 @@ export function AppSidebar() {
             <SidebarMenu>
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.id}>
-                  <SidebarMenuButton className="w-full justify-start">
+                  <SidebarMenuButton 
+                    className="w-full justify-start cursor-pointer"
+                    onClick={() => scrollToSection(item.id)}
+                  >
                     <item.icon className="w-4 h-4 mr-3" />
                     <span>{item.title}</span>
                   </SidebarMenuButton>

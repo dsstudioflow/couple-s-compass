@@ -22,8 +22,8 @@ const SCENARIOS = {
 
 interface WeddingCalculatorProps {
   data: {
-    weddingCosts: { category: string; planned_amount: number }[];
-    upsertWeddingCost: (cost: { category: string; planned_amount: number }) => Promise<boolean>;
+    weddingCosts: { category: string; planned_amount: number; actual_amount: number }[];
+    upsertWeddingCost: (cost: { category: string; planned_amount?: number; actual_amount?: number }) => Promise<boolean>;
   };
 }
 
@@ -31,9 +31,9 @@ export function WeddingCalculator({ data }: WeddingCalculatorProps) {
   const { weddingCosts, upsertWeddingCost } = data;
   const [activeScenario, setActiveScenario] = useState<string | null>(null);
 
-  const getCostValue = (category: string) => {
+  const getCostValue = (category: string, field: "planned_amount" | "actual_amount") => {
     const cost = weddingCosts.find((c) => c.category === category);
-    return cost?.planned_amount || 0;
+    return cost?.[field] || 0;
   };
 
   const handleScenario = async (scenario: keyof typeof SCENARIOS) => {
@@ -65,16 +65,30 @@ export function WeddingCalculator({ data }: WeddingCalculatorProps) {
             </Button>
           ))}
         </div>
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="space-y-3">
+          <div className="grid grid-cols-3 gap-2 text-xs font-medium text-muted-foreground">
+            <span>Categoria</span>
+            <span>Planejado</span>
+            <span>Real</span>
+          </div>
           {CATEGORIES.map((cat) => (
-            <div key={cat.key} className="space-y-1">
-              <Label htmlFor={cat.key} className="text-sm">{cat.label}</Label>
+            <div key={cat.key} className="grid grid-cols-3 gap-2 items-center">
+              <Label htmlFor={`${cat.key}-planned`} className="text-sm truncate">{cat.label}</Label>
               <Input
-                id={cat.key}
+                id={`${cat.key}-planned`}
                 type="number"
                 placeholder="R$ 0"
-                value={getCostValue(cat.key) || ""}
+                value={getCostValue(cat.key, "planned_amount") || ""}
                 onChange={(e) => upsertWeddingCost({ category: cat.key, planned_amount: Number(e.target.value) })}
+                className="text-sm"
+              />
+              <Input
+                id={`${cat.key}-actual`}
+                type="number"
+                placeholder="R$ 0"
+                value={getCostValue(cat.key, "actual_amount") || ""}
+                onChange={(e) => upsertWeddingCost({ category: cat.key, actual_amount: Number(e.target.value) })}
+                className="text-sm"
               />
             </div>
           ))}
