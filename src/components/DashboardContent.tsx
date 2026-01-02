@@ -1,9 +1,12 @@
 import { useCoupleData } from "@/hooks/useCoupleData";
 import { ViabilityCard } from "./dashboard/ViabilityCard";
+import { CoupleProfileCard } from "./dashboard/CoupleProfileCard";
 import { WeddingCalculator } from "./dashboard/WeddingCalculator";
+import { WeddingPieChart } from "./dashboard/WeddingPieChart";
+import { WeddingComparisonChart } from "./dashboard/WeddingComparisonChart";
 import { HousingPlanner } from "./dashboard/HousingPlanner";
 import { RecurringCosts } from "./dashboard/RecurringCosts";
-import { WeddingPieChart } from "./dashboard/WeddingPieChart";
+import { WealthProjectionChart } from "./dashboard/WealthProjectionChart";
 import { Loader2 } from "lucide-react";
 
 export function DashboardContent() {
@@ -19,17 +22,33 @@ export function DashboardContent() {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <ViabilityCard data={data} />
+      <section id="viability">
+        <ViabilityCard data={data} />
+      </section>
       
-      <div className="grid gap-6 lg:grid-cols-2">
-        <WeddingCalculator data={data} />
-        <WeddingPieChart weddingCosts={data.weddingCosts} />
-      </div>
+      <section id="couple-profile">
+        <CoupleProfileCard data={data} />
+      </section>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <section id="wedding" className="space-y-6">
+        <div className="grid gap-6 lg:grid-cols-2">
+          <WeddingCalculator data={data} />
+          <WeddingPieChart weddingCosts={data.weddingCosts} />
+        </div>
+        <WeddingComparisonChart weddingCosts={data.weddingCosts} />
+      </section>
+
+      <section id="housing">
         <HousingPlanner data={data} />
+      </section>
+
+      <section id="recurring">
         <RecurringCosts data={data} />
-      </div>
+      </section>
+
+      <section id="projection">
+        <WealthProjectionChart data={data} />
+      </section>
     </div>
   );
 }
