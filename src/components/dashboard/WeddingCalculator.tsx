@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Heart, Save, Check, Plus, X } from "lucide-react";
+import { Heart, Save, Check, Plus, X, GripVertical, ChevronUp, ChevronDown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const FIXED_CATEGORIES = [
@@ -37,6 +37,7 @@ export function WeddingCalculator({ data }: WeddingCalculatorProps) {
   const { toast } = useToast();
   const [activeScenario, setActiveScenario] = useState<string | null>(null);
   const [localCosts, setLocalCosts] = useState<CostValues>({});
+  const [categoryOrder, setCategoryOrder] = useState<string[]>([]);
   const [hasChanges, setHasChanges] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [justSaved, setJustSaved] = useState(false);
@@ -45,8 +46,9 @@ export function WeddingCalculator({ data }: WeddingCalculatorProps) {
   // Initialize local state from props - aggregate by category
   const initializeFromProps = useCallback(() => {
     const aggregated: CostValues = {};
+    const order: string[] = [];
     
-    // Initialize fixed categories
+    // Initialize fixed categories first
     FIXED_CATEGORIES.forEach(cat => {
       const matchingCosts = weddingCosts.filter(c => c.category === cat.key);
       if (matchingCosts.length > 0) {
@@ -59,6 +61,7 @@ export function WeddingCalculator({ data }: WeddingCalculatorProps) {
       } else {
         aggregated[cat.key] = { planned_amount: 0, actual_amount: 0, label: cat.label };
       }
+      order.push(cat.key);
     });
 
     // Initialize custom categories from existing data
@@ -67,12 +70,14 @@ export function WeddingCalculator({ data }: WeddingCalculatorProps) {
         aggregated[cost.category] = {
           planned_amount: cost.planned_amount || 0,
           actual_amount: cost.actual_amount || 0,
-          label: cost.category, // Custom categories use the key as label
+          label: cost.category, // Custom categories use the key as the display label
         };
+        order.push(cost.category);
       }
     });
 
     setLocalCosts(aggregated);
+    setCategoryOrder(order);
     setHasChanges(false);
   }, [weddingCosts]);
 
@@ -121,10 +126,15 @@ export function WeddingCalculator({ data }: WeddingCalculatorProps) {
     const trimmed = newCategoryName.trim();
     if (!trimmed) return;
     
-    // Generate a key from the name
-    const key = trimmed.toLowerCase().replace(/\s+/g, "_").normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    // Use the original name as the key (preserving case and spaces)
+    const key = trimmed;
     
-    if (localCosts[key]) {
+    // Check if category already exists (case-insensitive)
+    const existingKey = Object.keys(localCosts).find(
+      k => k.toLowerCase() === key.toLowerCase()
+    );
+    
+    if (existingKey) {
       toast({
         title: "Categoria já existe",
         description: "Já existe uma categoria com esse nome.",
@@ -137,17 +147,35 @@ export function WeddingCalculator({ data }: WeddingCalculatorProps) {
       ...prev,
       [key]: { planned_amount: 0, actual_amount: 0, label: trimmed },
     }));
+    setCategoryOrder(prev => [...prev, key]);
     setNewCategoryName("");
     setHasChanges(true);
     setJustSaved(false);
   };
 
   const handleRemoveCategory = (key: string) => {
-    if (FIXED_CATEGORY_KEYS.includes(key)) return; // Can't remove fixed categories
+    if (FIXED_CATEGORY_KEYS.includes(key)) return;
     setLocalCosts(prev => {
       const updated = { ...prev };
       delete updated[key];
       return updated;
+    });
+    setCategoryOrder(prev => prev.filter(k => k !== key));
+    setHasChanges(true);
+    setJustSaved(false);
+  };
+
+  const handleMoveCategory = (key: string, direction: "up" | "down") => {
+    setCategoryOrder(prev => {
+      const index = prev.indexOf(key);
+      if (index === -1) return prev;
+      
+      const newIndex = direction === "up" ? index - 1 : index + 1;
+      if (newIndex < 0 || newIndex >= prev.length) return prev;
+      
+      const newOrder = [...prev];
+      [newOrder[index], newOrder[newIndex]] = [newOrder[newIndex], newOrder[index]];
+      return newOrder;
     });
     setHasChanges(true);
     setJustSaved(false);
@@ -156,10 +184,11 @@ export function WeddingCalculator({ data }: WeddingCalculatorProps) {
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      const costsToSave = Object.entries(localCosts).map(([key, val]) => ({
+      // Save in the order defined by categoryOrder
+      const costsToSave = categoryOrder.map(key => ({
         category: key,
-        planned_amount: val.planned_amount || 0,
-        actual_amount: val.actual_amount || 0,
+        planned_amount: localCosts[key]?.planned_amount || 0,
+        actual_amount: localCosts[key]?.actual_amount || 0,
       }));
 
       const success = await saveAllWeddingCosts(costsToSave);
@@ -183,11 +212,10 @@ export function WeddingCalculator({ data }: WeddingCalculatorProps) {
   const formatCurrency = (value: number) =>
     new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
 
-  // Separate fixed and custom categories for rendering
-  const fixedCategoryEntries = FIXED_CATEGORIES.map(cat => ({ key: cat.key, ...localCosts[cat.key] }));
-  const customCategoryEntries = Object.entries(localCosts)
-    .filter(([key]) => !FIXED_CATEGORY_KEYS.includes(key))
-    .map(([key, val]) => ({ key, ...val }));
+  // Get ordered categories for rendering
+  const orderedCategories = categoryOrder
+    .filter(key => localCosts[key])
+    .map(key => ({ key, ...localCosts[key] }));
 
   return (
     <Card>
@@ -229,71 +257,83 @@ export function WeddingCalculator({ data }: WeddingCalculatorProps) {
           ))}
         </div>
         
-        {/* Fixed Categories */}
+        {/* Categories */}
         <div className="space-y-3">
-          <div className="grid grid-cols-3 gap-2 text-xs font-medium text-muted-foreground">
+          <div className="grid grid-cols-[auto_1fr_1fr_1fr_auto] gap-2 text-xs font-medium text-muted-foreground">
+            <span className="w-12"></span>
             <span>Categoria</span>
             <span>Planejado</span>
             <span>Real</span>
+            <span className="w-8"></span>
           </div>
-          {fixedCategoryEntries.map((cat) => (
-            <div key={cat.key} className="grid grid-cols-3 gap-2 items-center">
-              <Label htmlFor={`${cat.key}-planned`} className="text-sm truncate">{cat.label}</Label>
-              <Input
-                id={`${cat.key}-planned`}
-                type="number"
-                placeholder="R$ 0"
-                value={cat.planned_amount || ""}
-                onChange={(e) => handleInputChange(cat.key, "planned_amount", Number(e.target.value))}
-                className="text-sm"
-              />
-              <Input
-                id={`${cat.key}-actual`}
-                type="number"
-                placeholder="R$ 0"
-                value={cat.actual_amount || ""}
-                onChange={(e) => handleInputChange(cat.key, "actual_amount", Number(e.target.value))}
-                className="text-sm"
-              />
-            </div>
-          ))}
-
-          {/* Custom Categories */}
-          {customCategoryEntries.map((cat) => (
-            <div key={cat.key} className="grid grid-cols-[1fr_auto_auto_auto] gap-2 items-center">
-              <Label htmlFor={`${cat.key}-planned`} className="text-sm truncate">{cat.label}</Label>
-              <Input
-                id={`${cat.key}-planned`}
-                type="number"
-                placeholder="R$ 0"
-                value={cat.planned_amount || ""}
-                onChange={(e) => handleInputChange(cat.key, "planned_amount", Number(e.target.value))}
-                className="text-sm w-24"
-              />
-              <Input
-                id={`${cat.key}-actual`}
-                type="number"
-                placeholder="R$ 0"
-                value={cat.actual_amount || ""}
-                onChange={(e) => handleInputChange(cat.key, "actual_amount", Number(e.target.value))}
-                className="text-sm w-24"
-              />
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                onClick={() => handleRemoveCategory(cat.key)}
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-          ))}
+          {orderedCategories.map((cat, index) => {
+            const isFixed = FIXED_CATEGORY_KEYS.includes(cat.key);
+            return (
+              <div key={cat.key} className="grid grid-cols-[auto_1fr_1fr_1fr_auto] gap-2 items-center">
+                {/* Reorder buttons */}
+                <div className="flex flex-col w-12">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-5 w-5 text-muted-foreground hover:text-foreground"
+                    onClick={() => handleMoveCategory(cat.key, "up")}
+                    disabled={index === 0}
+                  >
+                    <ChevronUp className="h-3 w-3" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-5 w-5 text-muted-foreground hover:text-foreground"
+                    onClick={() => handleMoveCategory(cat.key, "down")}
+                    disabled={index === orderedCategories.length - 1}
+                  >
+                    <ChevronDown className="h-3 w-3" />
+                  </Button>
+                </div>
+                
+                <Label htmlFor={`${cat.key}-planned`} className="text-sm truncate">
+                  {cat.label}
+                </Label>
+                <Input
+                  id={`${cat.key}-planned`}
+                  type="number"
+                  placeholder="R$ 0"
+                  value={cat.planned_amount || ""}
+                  onChange={(e) => handleInputChange(cat.key, "planned_amount", Number(e.target.value))}
+                  className="text-sm"
+                />
+                <Input
+                  id={`${cat.key}-actual`}
+                  type="number"
+                  placeholder="R$ 0"
+                  value={cat.actual_amount || ""}
+                  onChange={(e) => handleInputChange(cat.key, "actual_amount", Number(e.target.value))}
+                  className="text-sm"
+                />
+                
+                {/* Remove button (only for custom categories) */}
+                <div className="w-8">
+                  {!isFixed && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                      onClick={() => handleRemoveCategory(cat.key)}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
         </div>
 
         {/* Add Custom Category */}
         <div className="flex gap-2 items-center pt-2">
           <Input
-            placeholder="Nova categoria (ex: Lua de mel)"
+            placeholder="Nova categoria (ex: Lua de Mel)"
             value={newCategoryName}
             onChange={(e) => setNewCategoryName(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleAddCategory()}
@@ -311,10 +351,12 @@ export function WeddingCalculator({ data }: WeddingCalculatorProps) {
         </div>
 
         {/* Totals */}
-        <div className="pt-3 border-t grid grid-cols-3 gap-2 font-medium">
+        <div className="pt-3 border-t grid grid-cols-[auto_1fr_1fr_1fr_auto] gap-2 font-medium">
+          <span className="w-12"></span>
           <span className="text-sm">Total</span>
           <span className="text-sm text-primary">{formatCurrency(totalPlanned)}</span>
           <span className="text-sm">{formatCurrency(totalActual)}</span>
+          <span className="w-8"></span>
         </div>
 
         {hasChanges && (

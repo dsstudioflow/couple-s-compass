@@ -1,9 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Legend, Cell } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Legend } from "recharts";
 import { BarChart3 } from "lucide-react";
 
-const CATEGORY_LABELS: Record<string, string> = {
+const FIXED_CATEGORY_LABELS: Record<string, string> = {
   cerimonia: "Cerimônia",
   festa: "Festa",
   vestido_terno: "Vestido/Terno",
@@ -17,12 +17,14 @@ interface WeddingComparisonChartProps {
 }
 
 export function WeddingComparisonChart({ weddingCosts }: WeddingComparisonChartProps) {
-  const chartData = Object.keys(CATEGORY_LABELS).map((key) => {
-    const cost = weddingCosts.find((c) => c.category === key);
+  // Build chart data from all wedding costs (fixed + custom)
+  const chartData = weddingCosts.map((cost) => {
+    // Use fixed label if available, otherwise use category as-is (custom categories store display name)
+    const label = FIXED_CATEGORY_LABELS[cost.category] || cost.category;
     return {
-      category: CATEGORY_LABELS[key],
-      planejado: cost?.planned_amount || 0,
-      real: cost?.actual_amount || 0,
+      category: label,
+      planejado: cost.planned_amount || 0,
+      real: cost.actual_amount || 0,
     };
   });
 
