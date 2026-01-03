@@ -126,6 +126,42 @@ export function useCoupleData() {
     return true;
   };
 
+  const saveAllWeddingCosts = async (costs: { category: string; planned_amount: number; actual_amount: number }[]) => {
+    if (!coupleProfile) return false;
+
+    try {
+      // Delete all existing wedding costs for this couple
+      await supabase
+        .from("wedding_costs")
+        .delete()
+        .eq("couple_id", coupleProfile.id);
+
+      // Insert all new costs
+      const { data, error } = await supabase
+        .from("wedding_costs")
+        .insert(
+          costs.map(cost => ({
+            couple_id: coupleProfile.id,
+            category: cost.category,
+            planned_amount: cost.planned_amount,
+            actual_amount: cost.actual_amount,
+          }))
+        )
+        .select();
+
+      if (error) {
+        toast({ title: "Erro", description: error.message, variant: "destructive" });
+        return false;
+      }
+
+      setWeddingCosts((data as WeddingCost[]) || []);
+      return true;
+    } catch (error) {
+      toast({ title: "Erro", description: "Erro ao salvar custos", variant: "destructive" });
+      return false;
+    }
+  };
+
   const upsertWeddingCost = async (cost: Partial<WeddingCost> & { category: string }) => {
     if (!coupleProfile) return;
 
@@ -272,6 +308,7 @@ export function useCoupleData() {
     recurringCosts,
     updateProfile,
     upsertWeddingCost,
+    saveAllWeddingCosts,
     upsertHousingConfig,
     addRecurringCost,
     updateRecurringCost,
