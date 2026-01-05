@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { BottomNav } from "@/components/BottomNav";
 import { DashboardContent } from "@/components/DashboardContent";
-import { Loader2, Heart } from "lucide-react";
+import { Loader2, Sparkles } from "lucide-react";
 
 const Index = () => {
   const { user, loading } = useAuth();
@@ -18,7 +18,13 @@ const Index = () => {
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        <div className="flex flex-col items-center gap-4">
+          <div className="relative">
+            <div className="absolute inset-0 blur-2xl bg-primary/20 rounded-full animate-pulse-soft" />
+            <Loader2 className="w-10 h-10 animate-spin text-primary relative" />
+          </div>
+          <p className="text-sm text-muted-foreground animate-pulse">Carregando...</p>
+        </div>
       </div>
     );
   }
@@ -29,13 +35,30 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="h-14 border-b flex items-center px-4 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-10">
-        <Heart className="w-5 h-5 mr-2 text-primary" />
-        <h1 className="font-display text-lg font-semibold">Planejador Financeiro</h1>
+      {/* Gradient background accent */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-1/2 -right-1/2 w-full h-full bg-gradient-to-bl from-primary/5 via-transparent to-transparent rounded-full blur-3xl" />
+        <div className="absolute -bottom-1/2 -left-1/2 w-full h-full bg-gradient-to-tr from-accent/5 via-transparent to-transparent rounded-full blur-3xl" />
+      </div>
+
+      <header className="relative h-16 border-b border-border/50 flex items-center px-6 bg-background/80 backdrop-blur-xl sticky top-0 z-10">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl gradient-primary flex items-center justify-center shadow-glow-sm">
+            <Sparkles className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <h1 className="font-display text-lg font-semibold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">
+              Planejador Financeiro
+            </h1>
+            <p className="text-xs text-muted-foreground -mt-0.5">Organize seu futuro a dois</p>
+          </div>
+        </div>
       </header>
-      <main className="p-4 md:p-6 pb-24">
+
+      <main className="relative p-4 md:p-8 pb-28 max-w-7xl mx-auto">
         <DashboardContent />
       </main>
+
       <BottomNav />
     </div>
   );

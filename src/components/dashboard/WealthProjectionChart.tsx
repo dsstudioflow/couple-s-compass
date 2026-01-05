@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Area, AreaChart } from "recharts";
-import { TrendingUp } from "lucide-react";
+import { XAxis, YAxis, ResponsiveContainer, Area, AreaChart } from "recharts";
+import { TrendingUp, Sparkles } from "lucide-react";
 
 interface WealthProjectionChartProps {
   data: {
@@ -46,41 +46,60 @@ export function WealthProjectionChart({ data }: WealthProjectionChartProps) {
 
   if (combinedIncome <= 0) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="font-display flex items-center gap-2">
-            <TrendingUp className="w-5 h-5 text-primary" />
-            Projeção de Patrimônio (12 meses)
-          </CardTitle>
+      <Card className="border-0 shadow-lg shadow-primary/5 overflow-hidden">
+        <CardHeader className="pb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-success/20 flex items-center justify-center">
+              <TrendingUp className="w-5 h-5 text-primary" />
+            </div>
+            <CardTitle className="font-display text-xl">Projeção de Patrimônio</CardTitle>
+          </div>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground text-center py-8">
-            Informe sua renda combinada para visualizar a projeção.
-          </p>
+          <div className="text-center py-12 text-muted-foreground">
+            <TrendingUp className="w-12 h-12 mx-auto mb-3 opacity-30" />
+            <p>Informe sua renda combinada</p>
+            <p className="text-sm">para visualizar a projeção</p>
+          </div>
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="font-display flex items-center gap-2">
-          <TrendingUp className="w-5 h-5 text-primary" />
-          Projeção de Patrimônio (12 meses)
-        </CardTitle>
+    <Card className="border-0 shadow-lg shadow-primary/5 overflow-hidden">
+      <CardHeader className="pb-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-success/20 flex items-center justify-center">
+            <TrendingUp className="w-5 h-5 text-primary" />
+          </div>
+          <div>
+            <CardTitle className="font-display text-xl">Projeção de Patrimônio</CardTitle>
+            <p className="text-sm text-muted-foreground">Próximos 12 meses</p>
+          </div>
+        </div>
       </CardHeader>
-      <CardContent>
-        <div className="mb-4 grid grid-cols-2 gap-4">
-          <div className="p-3 bg-muted/50 rounded-lg">
-            <p className="text-sm text-muted-foreground">Sobra Mensal</p>
-            <p className={`text-xl font-display font-semibold ${monthlyBalance < 0 ? "text-destructive" : "text-success"}`}>
+      <CardContent className="space-y-6">
+        <div className="grid grid-cols-2 gap-4">
+          <div className="p-5 bg-gradient-to-br from-success/5 to-success/10 rounded-2xl border border-success/20">
+            <div className="flex items-center gap-2 mb-1">
+              <div className="w-6 h-6 rounded-lg bg-success/10 flex items-center justify-center">
+                <TrendingUp className="w-3 h-3 text-success" />
+              </div>
+              <p className="text-sm text-muted-foreground">Sobra Mensal</p>
+            </div>
+            <p className={`text-2xl font-display font-bold ${monthlyBalance < 0 ? "text-destructive" : "text-success"}`}>
               {formatCurrency(monthlyBalance)}
             </p>
           </div>
-          <div className="p-3 bg-primary/10 rounded-lg">
-            <p className="text-sm text-muted-foreground">Projeção 12 meses</p>
-            <p className="text-xl font-display font-semibold text-primary">
+          <div className="p-5 bg-gradient-to-br from-primary/5 to-primary/10 rounded-2xl border border-primary/20">
+            <div className="flex items-center gap-2 mb-1">
+              <div className="w-6 h-6 rounded-lg bg-primary/10 flex items-center justify-center">
+                <Sparkles className="w-3 h-3 text-primary" />
+              </div>
+              <p className="text-sm text-muted-foreground">Projeção 12 meses</p>
+            </div>
+            <p className="text-2xl font-display font-bold text-primary">
               {formatCurrency(Math.max(0, monthlyBalance * 12))}
             </p>
           </div>
@@ -91,19 +110,19 @@ export function WealthProjectionChart({ data }: WealthProjectionChartProps) {
             <AreaChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
               <defs>
                 <linearGradient id="colorPatrimonio" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
+                  <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.4} />
                   <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <XAxis 
                 dataKey="month" 
-                tick={{ fontSize: 12 }} 
+                tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }} 
                 tickLine={false}
                 axisLine={false}
               />
               <YAxis 
                 tickFormatter={(value) => `R$${(value / 1000).toFixed(0)}k`}
-                tick={{ fontSize: 12 }}
+                tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }}
                 tickLine={false}
                 axisLine={false}
               />
@@ -116,7 +135,7 @@ export function WealthProjectionChart({ data }: WealthProjectionChartProps) {
                 stroke="hsl(var(--primary))"
                 fillOpacity={1}
                 fill="url(#colorPatrimonio)"
-                strokeWidth={2}
+                strokeWidth={3}
               />
             </AreaChart>
           </ResponsiveContainer>
