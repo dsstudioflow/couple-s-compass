@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Heart, Save, Check, Plus, X, GripVertical, ChevronUp, ChevronDown } from "lucide-react";
+import { Heart, Save, Check, Plus, X, ChevronUp, ChevronDown, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const FIXED_CATEGORIES = [
@@ -43,12 +43,10 @@ export function WeddingCalculator({ data }: WeddingCalculatorProps) {
   const [justSaved, setJustSaved] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
 
-  // Initialize local state from props - aggregate by category
   const initializeFromProps = useCallback(() => {
     const aggregated: CostValues = {};
     const order: string[] = [];
     
-    // Initialize fixed categories first
     FIXED_CATEGORIES.forEach(cat => {
       const matchingCosts = weddingCosts.filter(c => c.category === cat.key);
       if (matchingCosts.length > 0) {
@@ -64,13 +62,12 @@ export function WeddingCalculator({ data }: WeddingCalculatorProps) {
       order.push(cat.key);
     });
 
-    // Initialize custom categories from existing data
     weddingCosts.forEach(cost => {
       if (!FIXED_CATEGORY_KEYS.includes(cost.category) && !aggregated[cost.category]) {
         aggregated[cost.category] = {
           planned_amount: cost.planned_amount || 0,
           actual_amount: cost.actual_amount || 0,
-          label: cost.category, // Custom categories use the key as the display label
+          label: cost.category,
         };
         order.push(cost.category);
       }
@@ -102,7 +99,6 @@ export function WeddingCalculator({ data }: WeddingCalculatorProps) {
     const values = SCENARIOS[scenario];
     setLocalCosts(prev => {
       const newCosts: CostValues = {};
-      // Apply scenario only to fixed categories
       FIXED_CATEGORIES.forEach(cat => {
         newCosts[cat.key] = {
           planned_amount: values[cat.key as keyof typeof values] || 0,
@@ -110,7 +106,6 @@ export function WeddingCalculator({ data }: WeddingCalculatorProps) {
           label: cat.label,
         };
       });
-      // Keep custom categories as-is
       Object.entries(prev).forEach(([key, val]) => {
         if (!FIXED_CATEGORY_KEYS.includes(key)) {
           newCosts[key] = val;
@@ -126,10 +121,7 @@ export function WeddingCalculator({ data }: WeddingCalculatorProps) {
     const trimmed = newCategoryName.trim();
     if (!trimmed) return;
     
-    // Use the original name as the key (preserving case and spaces)
     const key = trimmed;
-    
-    // Check if category already exists (case-insensitive)
     const existingKey = Object.keys(localCosts).find(
       k => k.toLowerCase() === key.toLowerCase()
     );
@@ -184,7 +176,6 @@ export function WeddingCalculator({ data }: WeddingCalculatorProps) {
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      // Save in the order defined by categoryOrder
       const costsToSave = categoryOrder.map(key => ({
         category: key,
         planned_amount: localCosts[key]?.planned_amount || 0,
@@ -212,38 +203,40 @@ export function WeddingCalculator({ data }: WeddingCalculatorProps) {
   const formatCurrency = (value: number) =>
     new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
 
-  // Get ordered categories for rendering
   const orderedCategories = categoryOrder
     .filter(key => localCosts[key])
     .map(key => ({ key, ...localCosts[key] }));
 
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className="font-display flex items-center gap-2">
-          <Heart className="w-5 h-5 text-primary" />
-          Calculadora de Casamento
-        </CardTitle>
+    <Card className="border-0 shadow-lg shadow-primary/5 overflow-hidden">
+      <CardHeader className="flex flex-row items-center justify-between pb-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
+            <Heart className="w-5 h-5 text-primary" />
+          </div>
+          <CardTitle className="font-display text-xl">Calculadora de Casamento</CardTitle>
+        </div>
         <Button
           size="sm"
           onClick={handleSave}
           disabled={!hasChanges || isSaving}
-          className={justSaved ? "bg-emerald-600 hover:bg-emerald-600" : ""}
+          className={`rounded-xl h-10 px-4 ${justSaved ? "bg-success hover:bg-success" : ""}`}
         >
           {justSaved ? (
             <>
-              <Check className="w-4 h-4 mr-1" />
+              <Check className="w-4 h-4 mr-2" />
               Salvo
             </>
           ) : (
             <>
-              <Save className="w-4 h-4 mr-1" />
+              <Save className="w-4 h-4 mr-2" />
               {isSaving ? "Salvando..." : "Salvar"}
             </>
           )}
         </Button>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-5">
+        {/* Scenario buttons */}
         <div className="flex gap-2 flex-wrap">
           {(["economico", "padrao", "luxo"] as const).map((scenario) => (
             <Button
@@ -251,116 +244,131 @@ export function WeddingCalculator({ data }: WeddingCalculatorProps) {
               variant={activeScenario === scenario ? "default" : "outline"}
               size="sm"
               onClick={() => handleScenario(scenario)}
+              className="rounded-xl"
             >
-              {scenario === "economico" ? "Econômico" : scenario === "padrao" ? "Padrão" : "Luxo"}
+              {scenario === "economico" ? (
+                <>💰 Econômico</>
+              ) : scenario === "padrao" ? (
+                <>✨ Padrão</>
+              ) : (
+                <>👑 Luxo</>
+              )}
             </Button>
           ))}
         </div>
         
         {/* Categories */}
-        <div className="space-y-3">
-          <div className="grid grid-cols-[auto_1fr_1fr_1fr_auto] gap-2 text-xs font-medium text-muted-foreground">
-            <span className="w-12"></span>
+        <div className="space-y-2">
+          <div className="grid grid-cols-[auto_1fr_1fr_1fr_auto] gap-3 text-xs font-medium text-muted-foreground px-1">
+            <span className="w-10"></span>
             <span>Categoria</span>
             <span>Planejado</span>
             <span>Real</span>
             <span className="w-8"></span>
           </div>
-          {orderedCategories.map((cat, index) => {
-            const isFixed = FIXED_CATEGORY_KEYS.includes(cat.key);
-            return (
-              <div key={cat.key} className="grid grid-cols-[auto_1fr_1fr_1fr_auto] gap-2 items-center">
-                {/* Reorder buttons */}
-                <div className="flex flex-col w-12">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-5 w-5 text-muted-foreground hover:text-foreground"
-                    onClick={() => handleMoveCategory(cat.key, "up")}
-                    disabled={index === 0}
-                  >
-                    <ChevronUp className="h-3 w-3" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-5 w-5 text-muted-foreground hover:text-foreground"
-                    onClick={() => handleMoveCategory(cat.key, "down")}
-                    disabled={index === orderedCategories.length - 1}
-                  >
-                    <ChevronDown className="h-3 w-3" />
-                  </Button>
-                </div>
-                
-                <Label htmlFor={`${cat.key}-planned`} className="text-sm truncate">
-                  {cat.label}
-                </Label>
-                <Input
-                  id={`${cat.key}-planned`}
-                  type="number"
-                  placeholder="R$ 0"
-                  value={cat.planned_amount || ""}
-                  onChange={(e) => handleInputChange(cat.key, "planned_amount", Number(e.target.value))}
-                  className="text-sm"
-                />
-                <Input
-                  id={`${cat.key}-actual`}
-                  type="number"
-                  placeholder="R$ 0"
-                  value={cat.actual_amount || ""}
-                  onChange={(e) => handleInputChange(cat.key, "actual_amount", Number(e.target.value))}
-                  className="text-sm"
-                />
-                
-                {/* Remove button (only for custom categories) */}
-                <div className="w-8">
-                  {!isFixed && (
+          <div className="space-y-2">
+            {orderedCategories.map((cat, index) => {
+              const isFixed = FIXED_CATEGORY_KEYS.includes(cat.key);
+              return (
+                <div 
+                  key={cat.key} 
+                  className="grid grid-cols-[auto_1fr_1fr_1fr_auto] gap-3 items-center p-2 rounded-xl bg-muted/30 border border-border/50 hover:bg-muted/50 transition-colors"
+                >
+                  <div className="flex flex-col w-10">
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                      onClick={() => handleRemoveCategory(cat.key)}
+                      className="h-5 w-5 text-muted-foreground hover:text-foreground"
+                      onClick={() => handleMoveCategory(cat.key, "up")}
+                      disabled={index === 0}
                     >
-                      <X className="h-4 w-4" />
+                      <ChevronUp className="h-3 w-3" />
                     </Button>
-                  )}
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-5 w-5 text-muted-foreground hover:text-foreground"
+                      onClick={() => handleMoveCategory(cat.key, "down")}
+                      disabled={index === orderedCategories.length - 1}
+                    >
+                      <ChevronDown className="h-3 w-3" />
+                    </Button>
+                  </div>
+                  
+                  <Label htmlFor={`${cat.key}-planned`} className="text-sm font-medium truncate">
+                    {cat.label}
+                  </Label>
+                  <Input
+                    id={`${cat.key}-planned`}
+                    type="number"
+                    placeholder="R$ 0"
+                    value={cat.planned_amount || ""}
+                    onChange={(e) => handleInputChange(cat.key, "planned_amount", Number(e.target.value))}
+                    className="text-sm h-9 rounded-lg border-border/50"
+                  />
+                  <Input
+                    id={`${cat.key}-actual`}
+                    type="number"
+                    placeholder="R$ 0"
+                    value={cat.actual_amount || ""}
+                    onChange={(e) => handleInputChange(cat.key, "actual_amount", Number(e.target.value))}
+                    className="text-sm h-9 rounded-lg border-border/50"
+                  />
+                  
+                  <div className="w-8">
+                    {!isFixed && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                        onClick={() => handleRemoveCategory(cat.key)}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
 
         {/* Add Custom Category */}
-        <div className="flex gap-2 items-center pt-2">
+        <div className="flex gap-2 items-center">
           <Input
             placeholder="Nova categoria (ex: Lua de Mel)"
             value={newCategoryName}
             onChange={(e) => setNewCategoryName(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleAddCategory()}
-            className="text-sm flex-1"
+            className="text-sm flex-1 h-11 rounded-xl border-border/50"
           />
           <Button
             variant="outline"
             size="sm"
             onClick={handleAddCategory}
             disabled={!newCategoryName.trim()}
+            className="h-11 rounded-xl px-4"
           >
-            <Plus className="h-4 w-4 mr-1" />
+            <Plus className="h-4 w-4 mr-2" />
             Adicionar
           </Button>
         </div>
 
         {/* Totals */}
-        <div className="pt-3 border-t grid grid-cols-[auto_1fr_1fr_1fr_auto] gap-2 font-medium">
-          <span className="w-12"></span>
-          <span className="text-sm">Total</span>
-          <span className="text-sm text-primary">{formatCurrency(totalPlanned)}</span>
-          <span className="text-sm">{formatCurrency(totalActual)}</span>
-          <span className="w-8"></span>
+        <div className="pt-4 border-t border-border/50">
+          <div className="grid grid-cols-[auto_1fr_1fr_1fr_auto] gap-3 items-center p-3 rounded-xl bg-primary/5 border border-primary/20">
+            <div className="w-10 flex justify-center">
+              <Sparkles className="w-4 h-4 text-primary" />
+            </div>
+            <span className="font-display font-semibold">Total</span>
+            <span className="font-display font-bold text-primary">{formatCurrency(totalPlanned)}</span>
+            <span className="font-display font-semibold">{formatCurrency(totalActual)}</span>
+            <span className="w-8"></span>
+          </div>
         </div>
 
         {hasChanges && (
-          <p className="text-xs text-muted-foreground text-center">
+          <p className="text-xs text-muted-foreground text-center animate-pulse">
             Você tem alterações não salvas
           </p>
         )}

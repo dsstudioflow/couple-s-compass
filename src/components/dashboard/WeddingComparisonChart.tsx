@@ -17,9 +17,7 @@ interface WeddingComparisonChartProps {
 }
 
 export function WeddingComparisonChart({ weddingCosts }: WeddingComparisonChartProps) {
-  // Build chart data from all wedding costs (fixed + custom)
   const chartData = weddingCosts.map((cost) => {
-    // Use fixed label if available, otherwise use category as-is (custom categories store display name)
     const label = FIXED_CATEGORY_LABELS[cost.category] || cost.category;
     return {
       category: label,
@@ -46,29 +44,35 @@ export function WeddingComparisonChart({ weddingCosts }: WeddingComparisonChartP
 
   if (!hasData) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="font-display flex items-center gap-2">
-            <BarChart3 className="w-5 h-5 text-primary" />
-            Planejado vs Real
-          </CardTitle>
+      <Card className="border-0 shadow-lg shadow-primary/5 overflow-hidden">
+        <CardHeader className="pb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
+              <BarChart3 className="w-5 h-5 text-primary" />
+            </div>
+            <CardTitle className="font-display text-xl">Planejado vs Real</CardTitle>
+          </div>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground text-center py-8">
-            Adicione custos planejados e reais para visualizar a comparação.
-          </p>
+          <div className="text-center py-12 text-muted-foreground">
+            <BarChart3 className="w-12 h-12 mx-auto mb-3 opacity-30" />
+            <p>Adicione custos planejados e reais</p>
+            <p className="text-sm">para visualizar a comparação</p>
+          </div>
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="font-display flex items-center gap-2">
-          <BarChart3 className="w-5 h-5 text-primary" />
-          Planejado vs Real
-        </CardTitle>
+    <Card className="border-0 shadow-lg shadow-primary/5 overflow-hidden">
+      <CardHeader className="pb-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
+            <BarChart3 className="w-5 h-5 text-primary" />
+          </div>
+          <CardTitle className="font-display text-xl">Planejado vs Real</CardTitle>
+        </div>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig} className="h-[300px] w-full">
@@ -76,31 +80,34 @@ export function WeddingComparisonChart({ weddingCosts }: WeddingComparisonChartP
             <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
               <XAxis 
                 dataKey="category" 
-                tick={{ fontSize: 12 }} 
+                tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }} 
                 tickLine={false}
                 axisLine={false}
               />
               <YAxis 
                 tickFormatter={(value) => `R$${(value / 1000).toFixed(0)}k`}
-                tick={{ fontSize: 12 }}
+                tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }}
                 tickLine={false}
                 axisLine={false}
               />
               <ChartTooltip
                 content={<ChartTooltipContent formatter={(value) => formatCurrency(Number(value))} />}
               />
-              <Legend />
+              <Legend 
+                wrapperStyle={{ paddingTop: 20 }}
+                iconType="circle"
+              />
               <Bar 
                 dataKey="planejado" 
                 name="Planejado" 
                 fill="hsl(var(--primary))" 
-                radius={[4, 4, 0, 0]}
+                radius={[8, 8, 0, 0]}
               />
               <Bar 
                 dataKey="real" 
                 name="Real" 
                 fill="hsl(var(--accent))" 
-                radius={[4, 4, 0, 0]}
+                radius={[8, 8, 0, 0]}
               />
             </BarChart>
           </ResponsiveContainer>
