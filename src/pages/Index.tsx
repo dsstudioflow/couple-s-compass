@@ -34,28 +34,30 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background scroll-smooth">
       {/* Gradient background accent */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-1/2 -right-1/2 w-full h-full bg-gradient-to-bl from-primary/5 via-transparent to-transparent rounded-full blur-3xl" />
         <div className="absolute -bottom-1/2 -left-1/2 w-full h-full bg-gradient-to-tr from-accent/5 via-transparent to-transparent rounded-full blur-3xl" />
       </div>
 
-      <header className="relative h-16 border-b border-border/50 flex items-center px-6 bg-background/80 backdrop-blur-xl sticky top-0 z-10">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl gradient-primary flex items-center justify-center shadow-glow-sm">
-            <Sparkles className="w-5 h-5 text-white" />
+      <header className="relative h-14 md:h-16 border-b border-border/50 flex items-center px-4 md:px-6 bg-background/80 backdrop-blur-xl sticky top-0 z-10 safe-top">
+        <div className="flex items-center gap-2 md:gap-3">
+          <div className="w-8 h-8 md:w-9 md:h-9 rounded-xl gradient-primary flex items-center justify-center shadow-glow-sm shrink-0">
+            <Sparkles className="w-4 h-4 md:w-5 md:h-5 text-white" />
           </div>
-          <div>
-            <h1 className="font-display text-lg font-semibold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">
+          <div className="min-w-0">
+            <h1 className="font-display text-base md:text-lg font-semibold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text truncate">
               Planejador Financeiro
             </h1>
-            <p className="text-xs text-muted-foreground -mt-0.5">Organize seu futuro a dois</p>
+            <p className="text-[10px] md:text-xs text-muted-foreground -mt-0.5 hidden sm:block">
+              Organize seu futuro a dois
+            </p>
           </div>
         </div>
       </header>
 
-      <main className="relative p-4 md:p-8 pb-28 max-w-7xl mx-auto">
+      <main className="relative px-3 py-4 md:p-6 lg:p-8 pb-32 md:pb-28 max-w-7xl mx-auto">
         <DashboardContent />
       </main>
 

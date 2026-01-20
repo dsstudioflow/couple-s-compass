@@ -203,24 +203,27 @@ export function WeddingCalculator({ data }: WeddingCalculatorProps) {
   const formatCurrency = (value: number) =>
     new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
 
+  const formatCompact = (value: number) =>
+    new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", notation: "compact" }).format(value);
+
   const orderedCategories = categoryOrder
     .filter(key => localCosts[key])
     .map(key => ({ key, ...localCosts[key] }));
 
   return (
     <Card className="border-0 shadow-lg shadow-primary/5 overflow-hidden">
-      <CardHeader className="flex flex-row items-center justify-between pb-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
-            <Heart className="w-5 h-5 text-primary" />
+      <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 md:pb-4 px-4 md:px-6">
+        <div className="flex items-center gap-2 md:gap-3">
+          <div className="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center shrink-0">
+            <Heart className="w-4 h-4 md:w-5 md:h-5 text-primary" />
           </div>
-          <CardTitle className="font-display text-xl">Calculadora de Casamento</CardTitle>
+          <CardTitle className="font-display text-lg md:text-xl">Calculadora de Casamento</CardTitle>
         </div>
         <Button
           size="sm"
           onClick={handleSave}
           disabled={!hasChanges || isSaving}
-          className={`rounded-xl h-10 px-4 ${justSaved ? "bg-success hover:bg-success" : ""}`}
+          className={`rounded-xl h-10 px-4 w-full sm:w-auto ${justSaved ? "bg-success hover:bg-success" : ""}`}
         >
           {justSaved ? (
             <>
@@ -235,16 +238,16 @@ export function WeddingCalculator({ data }: WeddingCalculatorProps) {
           )}
         </Button>
       </CardHeader>
-      <CardContent className="space-y-5">
+      <CardContent className="space-y-4 md:space-y-5 px-4 md:px-6">
         {/* Scenario buttons */}
-        <div className="flex gap-2 flex-wrap">
+        <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1 -mx-1 px-1">
           {(["economico", "padrao", "luxo"] as const).map((scenario) => (
             <Button
               key={scenario}
               variant={activeScenario === scenario ? "default" : "outline"}
               size="sm"
               onClick={() => handleScenario(scenario)}
-              className="rounded-xl"
+              className="rounded-xl shrink-0 text-xs md:text-sm"
             >
               {scenario === "economico" ? (
                 <>💰 Econômico</>
@@ -257,75 +260,142 @@ export function WeddingCalculator({ data }: WeddingCalculatorProps) {
           ))}
         </div>
         
-        {/* Categories */}
+        {/* Mobile-optimized categories list */}
         <div className="space-y-2">
-          <div className="grid grid-cols-[auto_1fr_1fr_1fr_auto] gap-3 text-xs font-medium text-muted-foreground px-1">
+          {/* Header - hidden on mobile, visible on larger screens */}
+          <div className="hidden md:grid grid-cols-[auto_1fr_1fr_1fr_auto] gap-3 text-xs font-medium text-muted-foreground px-1">
             <span className="w-10"></span>
             <span>Categoria</span>
             <span>Planejado</span>
             <span>Real</span>
             <span className="w-8"></span>
           </div>
+
+          {/* Categories */}
           <div className="space-y-2">
             {orderedCategories.map((cat, index) => {
               const isFixed = FIXED_CATEGORY_KEYS.includes(cat.key);
               return (
                 <div 
                   key={cat.key} 
-                  className="grid grid-cols-[auto_1fr_1fr_1fr_auto] gap-3 items-center p-2 rounded-xl bg-muted/30 border border-border/50 hover:bg-muted/50 transition-colors"
+                  className="p-3 md:p-2 rounded-xl bg-muted/30 border border-border/50 transition-colors"
                 >
-                  <div className="flex flex-col w-10">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-5 w-5 text-muted-foreground hover:text-foreground"
-                      onClick={() => handleMoveCategory(cat.key, "up")}
-                      disabled={index === 0}
-                    >
-                      <ChevronUp className="h-3 w-3" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-5 w-5 text-muted-foreground hover:text-foreground"
-                      onClick={() => handleMoveCategory(cat.key, "down")}
-                      disabled={index === orderedCategories.length - 1}
-                    >
-                      <ChevronDown className="h-3 w-3" />
-                    </Button>
+                  {/* Mobile layout */}
+                  <div className="flex flex-col gap-2 md:hidden">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-sm font-medium">{cat.label}</Label>
+                      <div className="flex items-center gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-muted-foreground"
+                          onClick={() => handleMoveCategory(cat.key, "up")}
+                          disabled={index === 0}
+                        >
+                          <ChevronUp className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-muted-foreground"
+                          onClick={() => handleMoveCategory(cat.key, "down")}
+                          disabled={index === orderedCategories.length - 1}
+                        >
+                          <ChevronDown className="h-4 w-4" />
+                        </Button>
+                        {!isFixed && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                            onClick={() => handleRemoveCategory(cat.key)}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="space-y-1">
+                        <span className="text-[10px] text-muted-foreground">Planejado</span>
+                        <Input
+                          type="number"
+                          inputMode="numeric"
+                          placeholder="R$ 0"
+                          value={cat.planned_amount || ""}
+                          onChange={(e) => handleInputChange(cat.key, "planned_amount", Number(e.target.value))}
+                          className="text-sm h-10 rounded-lg border-border/50"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <span className="text-[10px] text-muted-foreground">Real</span>
+                        <Input
+                          type="number"
+                          inputMode="numeric"
+                          placeholder="R$ 0"
+                          value={cat.actual_amount || ""}
+                          onChange={(e) => handleInputChange(cat.key, "actual_amount", Number(e.target.value))}
+                          className="text-sm h-10 rounded-lg border-border/50"
+                        />
+                      </div>
+                    </div>
                   </div>
-                  
-                  <Label htmlFor={`${cat.key}-planned`} className="text-sm font-medium truncate">
-                    {cat.label}
-                  </Label>
-                  <Input
-                    id={`${cat.key}-planned`}
-                    type="number"
-                    placeholder="R$ 0"
-                    value={cat.planned_amount || ""}
-                    onChange={(e) => handleInputChange(cat.key, "planned_amount", Number(e.target.value))}
-                    className="text-sm h-9 rounded-lg border-border/50"
-                  />
-                  <Input
-                    id={`${cat.key}-actual`}
-                    type="number"
-                    placeholder="R$ 0"
-                    value={cat.actual_amount || ""}
-                    onChange={(e) => handleInputChange(cat.key, "actual_amount", Number(e.target.value))}
-                    className="text-sm h-9 rounded-lg border-border/50"
-                  />
-                  
-                  <div className="w-8">
-                    {!isFixed && (
+
+                  {/* Desktop layout */}
+                  <div className="hidden md:grid grid-cols-[auto_1fr_1fr_1fr_auto] gap-3 items-center">
+                    <div className="flex flex-col w-10">
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-                        onClick={() => handleRemoveCategory(cat.key)}
+                        className="h-5 w-5 text-muted-foreground hover:text-foreground"
+                        onClick={() => handleMoveCategory(cat.key, "up")}
+                        disabled={index === 0}
                       >
-                        <X className="h-4 w-4" />
+                        <ChevronUp className="h-3 w-3" />
                       </Button>
-                    )}
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-5 w-5 text-muted-foreground hover:text-foreground"
+                        onClick={() => handleMoveCategory(cat.key, "down")}
+                        disabled={index === orderedCategories.length - 1}
+                      >
+                        <ChevronDown className="h-3 w-3" />
+                      </Button>
+                    </div>
+                    
+                    <Label htmlFor={`${cat.key}-planned`} className="text-sm font-medium truncate">
+                      {cat.label}
+                    </Label>
+                    <Input
+                      id={`${cat.key}-planned`}
+                      type="number"
+                      placeholder="R$ 0"
+                      value={cat.planned_amount || ""}
+                      onChange={(e) => handleInputChange(cat.key, "planned_amount", Number(e.target.value))}
+                      className="text-sm h-9 rounded-lg border-border/50"
+                    />
+                    <Input
+                      id={`${cat.key}-actual`}
+                      type="number"
+                      placeholder="R$ 0"
+                      value={cat.actual_amount || ""}
+                      onChange={(e) => handleInputChange(cat.key, "actual_amount", Number(e.target.value))}
+                      className="text-sm h-9 rounded-lg border-border/50"
+                    />
+                    
+                    <div className="w-8">
+                      {!isFixed && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                          onClick={() => handleRemoveCategory(cat.key)}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </div>
               );
@@ -334,7 +404,7 @@ export function WeddingCalculator({ data }: WeddingCalculatorProps) {
         </div>
 
         {/* Add Custom Category */}
-        <div className="flex gap-2 items-center">
+        <div className="flex flex-col sm:flex-row gap-2">
           <Input
             placeholder="Nova categoria (ex: Lua de Mel)"
             value={newCategoryName}
@@ -347,7 +417,7 @@ export function WeddingCalculator({ data }: WeddingCalculatorProps) {
             size="sm"
             onClick={handleAddCategory}
             disabled={!newCategoryName.trim()}
-            className="h-11 rounded-xl px-4"
+            className="h-11 rounded-xl px-4 w-full sm:w-auto"
           >
             <Plus className="h-4 w-4 mr-2" />
             Adicionar
@@ -355,15 +425,24 @@ export function WeddingCalculator({ data }: WeddingCalculatorProps) {
         </div>
 
         {/* Totals */}
-        <div className="pt-4 border-t border-border/50">
-          <div className="grid grid-cols-[auto_1fr_1fr_1fr_auto] gap-3 items-center p-3 rounded-xl bg-primary/5 border border-primary/20">
-            <div className="w-10 flex justify-center">
-              <Sparkles className="w-4 h-4 text-primary" />
+        <div className="pt-3 md:pt-4 border-t border-border/50">
+          <div className="p-3 md:p-4 rounded-xl bg-primary/5 border border-primary/20">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-primary" />
+                <span className="font-display font-semibold text-sm md:text-base">Total</span>
+              </div>
+              <div className="flex items-center gap-3 md:gap-6">
+                <div className="text-right">
+                  <p className="text-[10px] text-muted-foreground">Planejado</p>
+                  <p className="font-display font-bold text-primary text-sm md:text-base">{formatCompact(totalPlanned)}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-[10px] text-muted-foreground">Real</p>
+                  <p className="font-display font-semibold text-sm md:text-base">{formatCompact(totalActual)}</p>
+                </div>
+              </div>
             </div>
-            <span className="font-display font-semibold">Total</span>
-            <span className="font-display font-bold text-primary">{formatCurrency(totalPlanned)}</span>
-            <span className="font-display font-semibold">{formatCurrency(totalActual)}</span>
-            <span className="w-8"></span>
           </div>
         </div>
 

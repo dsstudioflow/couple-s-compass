@@ -1,20 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
-import { useMemo } from "react";
-import { PieChart as PieIcon } from "lucide-react";
+import { PieChart as PieChartIcon } from "lucide-react";
 
-const COLORS = [
-  "hsl(250, 60%, 55%)",
-  "hsl(12, 80%, 60%)",
-  "hsl(160, 70%, 42%)",
-  "hsl(38, 92%, 50%)",
-  "hsl(280, 65%, 55%)",
-  "hsl(200, 80%, 55%)",
-  "hsl(330, 70%, 55%)",
-  "hsl(60, 70%, 50%)",
-];
-
-const LABELS: Record<string, string> = {
+const FIXED_CATEGORY_LABELS: Record<string, string> = {
   cerimonia: "Cerimônia",
   festa: "Festa",
   vestido_terno: "Vestido/Terno",
@@ -23,50 +12,64 @@ const LABELS: Record<string, string> = {
   fotografia: "Fotografia",
 };
 
+const COLORS = [
+  "hsl(250, 60%, 55%)",  // Primary violet
+  "hsl(12, 80%, 60%)",   // Coral accent
+  "hsl(160, 70%, 42%)",  // Success green
+  "hsl(38, 92%, 50%)",   // Warning amber
+  "hsl(280, 65%, 55%)",  // Purple
+  "hsl(200, 80%, 55%)",  // Sky blue
+  "hsl(330, 70%, 55%)",  // Pink
+  "hsl(170, 60%, 45%)",  // Teal
+];
+
 interface WeddingPieChartProps {
-  weddingCosts: { category: string; planned_amount: number }[];
+  weddingCosts: { category: string; planned_amount: number; actual_amount: number }[];
 }
 
 export function WeddingPieChart({ weddingCosts }: WeddingPieChartProps) {
-  const chartData = useMemo(() => 
-    weddingCosts
-      .filter((c) => c.planned_amount > 0)
-      .map((c) => ({
-        name: LABELS[c.category] || c.category,
-        value: c.planned_amount,
-      }))
-      .sort((a, b) => b.value - a.value),
-    [weddingCosts]
-  );
+  const chartData = weddingCosts
+    .filter(c => (c.planned_amount || 0) > 0)
+    .map((cost) => {
+      const label = FIXED_CATEGORY_LABELS[cost.category] || cost.category;
+      return {
+        name: label,
+        value: cost.planned_amount || 0,
+      };
+    });
 
-  const total = useMemo(() => 
-    chartData.reduce((sum, item) => sum + item.value, 0),
-    [chartData]
+  const total = chartData.reduce((sum, item) => sum + item.value, 0);
+
+  const chartConfig = Object.fromEntries(
+    chartData.map((item, index) => [
+      item.name,
+      { label: item.name, color: COLORS[index % COLORS.length] },
+    ])
   );
 
   const formatCurrency = (value: number) =>
     new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
 
-  const formatCompact = (value: number) => {
-    if (value >= 1000) {
-      return `R$ ${(value / 1000).toFixed(1)}k`;
-    }
-    return `R$ ${value}`;
-  };
+  const formatCompact = (value: number) =>
+    new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", notation: "compact", maximumFractionDigits: 1 }).format(value);
 
   if (chartData.length === 0) {
     return (
       <Card className="border-0 shadow-lg shadow-primary/5 overflow-hidden">
-        <CardHeader className="pb-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent/20 to-primary/20 flex items-center justify-center">
-              <PieIcon className="w-5 h-5 text-accent" />
+        <CardHeader className="pb-3 md:pb-4 px-4 md:px-6">
+          <div className="flex items-center gap-2 md:gap-3">
+            <div className="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-gradient-to-br from-accent/20 to-warning/20 flex items-center justify-center shrink-0">
+              <PieChartIcon className="w-4 h-4 md:w-5 md:h-5 text-accent" />
             </div>
-            <CardTitle className="font-display text-xl">Distribuição de Gastos</CardTitle>
+            <CardTitle className="font-display text-lg md:text-xl">Distribuição de Gastos</CardTitle>
           </div>
         </CardHeader>
-        <CardContent className="h-72 flex items-center justify-center text-muted-foreground">
-          Adicione custos do casamento para ver o gráfico
+        <CardContent className="px-4 md:px-6">
+          <div className="text-center py-10 md:py-12 text-muted-foreground">
+            <PieChartIcon className="w-10 h-10 md:w-12 md:h-12 mx-auto mb-3 opacity-30" />
+            <p className="text-sm md:text-base">Adicione custos planejados</p>
+            <p className="text-xs md:text-sm">para visualizar a distribuição</p>
+          </div>
         </CardContent>
       </Card>
     );
@@ -74,27 +77,30 @@ export function WeddingPieChart({ weddingCosts }: WeddingPieChartProps) {
 
   return (
     <Card className="border-0 shadow-lg shadow-primary/5 overflow-hidden">
-      <CardHeader className="pb-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent/20 to-primary/20 flex items-center justify-center">
-            <PieIcon className="w-5 h-5 text-accent" />
+      <CardHeader className="pb-3 md:pb-4 px-4 md:px-6">
+        <div className="flex items-center gap-2 md:gap-3">
+          <div className="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-gradient-to-br from-accent/20 to-warning/20 flex items-center justify-center shrink-0">
+            <PieChartIcon className="w-4 h-4 md:w-5 md:h-5 text-accent" />
           </div>
-          <CardTitle className="font-display text-xl">Distribuição de Gastos</CardTitle>
+          <div>
+            <CardTitle className="font-display text-lg md:text-xl">Distribuição de Gastos</CardTitle>
+            <p className="text-xs md:text-sm text-muted-foreground mt-0.5">Total: {formatCompact(total)}</p>
+          </div>
         </div>
       </CardHeader>
-      <CardContent className="p-0">
-        <div className="flex flex-col lg:flex-row items-center gap-6 p-6">
+      <CardContent className="px-4 md:px-6">
+        <div className="flex flex-col lg:flex-row items-center gap-4 md:gap-6">
           {/* Chart */}
-          <div className="relative w-full lg:w-1/2 h-64">
+          <div className="relative w-full lg:w-1/2 h-48 md:h-64">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
                   data={chartData}
                   cx="50%"
                   cy="50%"
-                  innerRadius={70}
-                  outerRadius={100}
-                  paddingAngle={4}
+                  innerRadius="50%"
+                  outerRadius="80%"
+                  paddingAngle={3}
                   dataKey="value"
                   strokeWidth={0}
                 >
@@ -113,7 +119,8 @@ export function WeddingPieChart({ weddingCosts }: WeddingPieChartProps) {
                     border: '1px solid hsl(var(--border))',
                     borderRadius: '12px',
                     boxShadow: '0 10px 40px rgba(0,0,0,0.15)',
-                    padding: '12px 16px',
+                    padding: '10px 14px',
+                    fontSize: '13px',
                   }}
                   labelStyle={{ color: 'hsl(var(--popover-foreground))', fontWeight: 600 }}
                 />
@@ -122,35 +129,37 @@ export function WeddingPieChart({ weddingCosts }: WeddingPieChartProps) {
             {/* Center label */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <div className="text-center">
-                <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Total</p>
-                <p className="text-2xl font-display font-bold text-foreground">{formatCompact(total)}</p>
+                <p className="text-[10px] md:text-xs text-muted-foreground font-medium uppercase tracking-wide">Total</p>
+                <p className="text-xl md:text-2xl font-display font-bold text-foreground">{formatCompact(total)}</p>
               </div>
             </div>
           </div>
 
-          {/* Legend */}
-          <div className="w-full lg:w-1/2 grid grid-cols-2 gap-3">
-            {chartData.map((item, index) => {
-              const percent = ((item.value / total) * 100).toFixed(0);
-              return (
-                <div 
-                  key={item.name}
-                  className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 border border-border/50 hover:bg-muted/50 hover:shadow-sm transition-all cursor-default"
-                >
+          {/* Legend - horizontal scroll on mobile */}
+          <div className="w-full lg:w-1/2">
+            <div className="flex lg:grid lg:grid-cols-2 gap-2 overflow-x-auto lg:overflow-visible scrollbar-hide pb-2 lg:pb-0 -mx-1 px-1">
+              {chartData.map((item, index) => {
+                const percent = ((item.value / total) * 100).toFixed(0);
+                return (
                   <div 
-                    className="w-4 h-4 rounded-full shrink-0 shadow-sm"
-                    style={{ backgroundColor: COLORS[index % COLORS.length] }}
-                  />
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium text-foreground truncate">{item.name}</p>
-                    <div className="flex items-baseline gap-1.5">
-                      <span className="text-xs font-medium text-muted-foreground">{formatCompact(item.value)}</span>
-                      <span className="text-[10px] text-muted-foreground/60 bg-muted px-1.5 py-0.5 rounded-full">{percent}%</span>
+                    key={item.name}
+                    className="flex items-center gap-2 md:gap-3 p-2.5 md:p-3 rounded-xl bg-muted/30 border border-border/50 min-w-[140px] lg:min-w-0 shrink-0 lg:shrink"
+                  >
+                    <div 
+                      className="w-3 h-3 md:w-4 md:h-4 rounded-full shrink-0"
+                      style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                    />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs md:text-sm font-medium text-foreground truncate">{item.name}</p>
+                      <div className="flex items-baseline gap-1">
+                        <span className="text-[10px] md:text-xs font-medium text-muted-foreground">{formatCompact(item.value)}</span>
+                        <span className="text-[9px] md:text-[10px] text-muted-foreground/60 bg-muted px-1 py-0.5 rounded-full">{percent}%</span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
         </div>
       </CardContent>
