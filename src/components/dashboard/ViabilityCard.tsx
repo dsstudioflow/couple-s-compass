@@ -1,20 +1,25 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { TrendingUp, TrendingDown, AlertTriangle, Home, Receipt, Wallet, PiggyBank, Sparkles } from "lucide-react";
+import { TrendingUp, TrendingDown, AlertTriangle, Home, Receipt, PiggyBank, Sparkles } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Button } from "@/components/ui/button";
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";
+import { IncomeSection } from "./IncomeSection";
 
 interface ViabilityCardProps {
   data: {
-    coupleProfile: { combined_income: number } | null;
+    coupleProfile: { 
+      combined_income: number; 
+      user_income: number; 
+      partner_income: number;
+      user_name: string | null;
+      partner_name: string | null;
+    } | null;
     weddingCosts: { planned_amount: number }[];
     housingConfig: { rent_amount: number; housing_type: string } | null;
     recurringCosts: { amount: number; name: string }[];
-    updateProfile: (updates: { combined_income: number }) => Promise<boolean>;
+    updateProfile: (updates: { user_income?: number; partner_income?: number; combined_income?: number }) => Promise<boolean>;
   };
 }
 
@@ -26,7 +31,10 @@ export function ViabilityCard({ data }: ViabilityCardProps) {
   const monthlyHousing = housingConfig?.housing_type === "rent" ? (housingConfig?.rent_amount || 0) : 0;
   const totalRecurring = recurringCosts.reduce((sum, c) => sum + (c.amount || 0), 0);
   const totalMonthly = monthlyHousing + totalRecurring;
-  const combinedIncome = coupleProfile?.combined_income || 0;
+  
+  const userIncome = coupleProfile?.user_income || 0;
+  const partnerIncome = coupleProfile?.partner_income || 0;
+  const combinedIncome = userIncome + partnerIncome;
   
   const monthlyBalance = combinedIncome - totalMonthly;
   const savingsRate = combinedIncome > 0 ? (monthlyBalance / combinedIncome) * 100 : 0;
@@ -47,6 +55,14 @@ export function ViabilityCard({ data }: ViabilityCardProps) {
 
   const formatCurrency = (value: number) =>
     new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
+
+  const handleUserIncomeChange = async (value: number) => {
+    await updateProfile({ user_income: value, combined_income: value + partnerIncome });
+  };
+
+  const handlePartnerIncomeChange = async (value: number) => {
+    await updateProfile({ partner_income: value, combined_income: userIncome + value });
+  };
 
   return (
     <Card className="relative overflow-hidden border-0 shadow-xl shadow-primary/5 bg-gradient-to-br from-card via-card to-primary/5">
@@ -77,26 +93,18 @@ export function ViabilityCard({ data }: ViabilityCardProps) {
       </CardHeader>
 
       <CardContent className="relative space-y-4 md:space-y-6 px-4 md:px-6">
+        {/* Income Section */}
+        <IncomeSection
+          userName={coupleProfile?.user_name || null}
+          partnerName={coupleProfile?.partner_name || null}
+          userIncome={userIncome}
+          partnerIncome={partnerIncome}
+          onUserIncomeChange={handleUserIncomeChange}
+          onPartnerIncomeChange={handlePartnerIncomeChange}
+        />
+
         {/* Main metrics - responsive grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
-          <div className="group space-y-2 md:space-y-3 p-3 md:p-5 bg-gradient-to-br from-muted/50 to-muted/30 rounded-xl md:rounded-2xl border border-border/50 transition-all active:scale-[0.98] md:hover:shadow-lg md:hover:shadow-primary/5 md:hover:-translate-y-0.5">
-            <div className="flex items-center gap-1.5 md:gap-2">
-              <div className="w-6 h-6 md:w-8 md:h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                <Wallet className="w-3 h-3 md:w-4 md:h-4 text-primary" />
-              </div>
-              <Label htmlFor="income" className="text-[10px] md:text-sm font-medium text-muted-foreground truncate">Renda Mensal</Label>
-            </div>
-            <Input
-              id="income"
-              type="number"
-              inputMode="numeric"
-              placeholder="0"
-              value={combinedIncome || ""}
-              onChange={(e) => updateProfile({ combined_income: Number(e.target.value) })}
-              className="text-base md:text-xl font-display font-semibold bg-background/80 border-0 h-10 md:h-12 rounded-lg md:rounded-xl"
-            />
-          </div>
-          
+        <div className="grid grid-cols-3 gap-3 md:gap-4">
           <div className="group space-y-2 md:space-y-3 p-3 md:p-5 bg-gradient-to-br from-accent/5 to-accent/10 rounded-xl md:rounded-2xl border border-accent/20 transition-all active:scale-[0.98] md:hover:shadow-lg md:hover:-translate-y-0.5">
             <div className="flex items-center gap-1.5 md:gap-2">
               <div className="w-6 h-6 md:w-8 md:h-8 rounded-lg bg-accent/10 flex items-center justify-center shrink-0">

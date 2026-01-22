@@ -24,6 +24,7 @@ export function WeddingCalculator({ data }: WeddingCalculatorProps) {
     setNewCategoryName,
     handleModeChange,
     handleInputChange,
+    handleLabelChange,
     handleScenario,
     handleAddCategory,
     handleRemoveCategory,
@@ -142,6 +143,7 @@ export function WeddingCalculator({ data }: WeddingCalculatorProps) {
                   totalCount={orderedCategories.length}
                   isFixed={isFixedCategory(cat.key)}
                   onInputChange={handleInputChange}
+                  onLabelChange={handleLabelChange}
                   onMove={handleMoveCategory}
                   onRemove={handleRemoveCategory}
                 />
