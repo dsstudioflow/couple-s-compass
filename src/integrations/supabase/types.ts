@@ -20,10 +20,12 @@ export type Database = {
           created_at: string | null
           id: string
           partner_email: string | null
+          partner_income: number | null
           partner_name: string | null
           partner_user_id: string | null
           updated_at: string | null
           user_id: string
+          user_income: number | null
           user_name: string | null
           wedding_date: string | null
         }
@@ -32,10 +34,12 @@ export type Database = {
           created_at?: string | null
           id?: string
           partner_email?: string | null
+          partner_income?: number | null
           partner_name?: string | null
           partner_user_id?: string | null
           updated_at?: string | null
           user_id: string
+          user_income?: number | null
           user_name?: string | null
           wedding_date?: string | null
         }
@@ -44,10 +48,12 @@ export type Database = {
           created_at?: string | null
           id?: string
           partner_email?: string | null
+          partner_income?: number | null
           partner_name?: string | null
           partner_user_id?: string | null
           updated_at?: string | null
           user_id?: string
+          user_income?: number | null
           user_name?: string | null
           wedding_date?: string | null
         }

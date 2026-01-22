@@ -1,7 +1,8 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ChevronUp, ChevronDown, X } from "lucide-react";
+import { ChevronUp, ChevronDown, X, Pencil, Check } from "lucide-react";
 
 interface CategoryRowProps {
   category: {
@@ -14,6 +15,7 @@ interface CategoryRowProps {
   totalCount: number;
   isFixed: boolean;
   onInputChange: (category: string, field: "planned_amount" | "actual_amount", value: number) => void;
+  onLabelChange: (key: string, newLabel: string) => void;
   onMove: (key: string, direction: "up" | "down") => void;
   onRemove: (key: string) => void;
 }
@@ -24,15 +26,67 @@ export function CategoryRow({
   totalCount,
   isFixed,
   onInputChange,
+  onLabelChange,
   onMove,
   onRemove,
 }: CategoryRowProps) {
+  const [isEditingLabel, setIsEditingLabel] = useState(false);
+  const [editLabel, setEditLabel] = useState(category.label);
+
+  const handleSaveLabel = () => {
+    if (editLabel.trim()) {
+      onLabelChange(category.key, editLabel.trim());
+    }
+    setIsEditingLabel(false);
+  };
+
   return (
     <div className="p-3 md:p-2 rounded-xl bg-muted/30 border border-border/50 transition-colors">
       {/* Mobile layout */}
       <div className="flex flex-col gap-2 md:hidden">
         <div className="flex items-center justify-between">
-          <Label className="text-sm font-medium">{category.label}</Label>
+          {isEditingLabel && !isFixed ? (
+            <div className="flex items-center gap-2 flex-1 mr-2">
+              <Input
+                value={editLabel}
+                onChange={(e) => setEditLabel(e.target.value)}
+                className="h-8 text-sm rounded-lg flex-1"
+                autoFocus
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleSaveLabel();
+                  if (e.key === "Escape") {
+                    setEditLabel(category.label);
+                    setIsEditingLabel(false);
+                  }
+                }}
+              />
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-primary"
+                onClick={handleSaveLabel}
+              >
+                <Check className="h-4 w-4" />
+              </Button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <Label className="text-sm font-medium">{category.label}</Label>
+              {!isFixed && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6 text-muted-foreground hover:text-primary"
+                  onClick={() => {
+                    setEditLabel(category.label);
+                    setIsEditingLabel(true);
+                  }}
+                >
+                  <Pencil className="h-3 w-3" />
+                </Button>
+              )}
+            </div>
+          )}
           <div className="flex items-center gap-1">
             <Button
               variant="ghost"
@@ -113,9 +167,50 @@ export function CategoryRow({
           </Button>
         </div>
         
-        <Label htmlFor={`${category.key}-planned`} className="text-sm font-medium truncate">
-          {category.label}
-        </Label>
+        {isEditingLabel && !isFixed ? (
+          <div className="flex items-center gap-2">
+            <Input
+              value={editLabel}
+              onChange={(e) => setEditLabel(e.target.value)}
+              className="text-sm h-8 rounded-lg flex-1"
+              autoFocus
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleSaveLabel();
+                if (e.key === "Escape") {
+                  setEditLabel(category.label);
+                  setIsEditingLabel(false);
+                }
+              }}
+            />
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-primary"
+              onClick={handleSaveLabel}
+            >
+              <Check className="h-4 w-4" />
+            </Button>
+          </div>
+        ) : (
+          <div className="flex items-center gap-2 group/label">
+            <Label htmlFor={`${category.key}-planned`} className="text-sm font-medium truncate">
+              {category.label}
+            </Label>
+            {!isFixed && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6 text-muted-foreground hover:text-primary opacity-0 group-hover/label:opacity-100 transition-opacity"
+                onClick={() => {
+                  setEditLabel(category.label);
+                  setIsEditingLabel(true);
+                }}
+              >
+                <Pencil className="h-3 w-3" />
+              </Button>
+            )}
+          </div>
+        )}
         <Input
           id={`${category.key}-planned`}
           type="number"

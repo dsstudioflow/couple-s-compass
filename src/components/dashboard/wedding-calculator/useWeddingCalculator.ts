@@ -117,6 +117,21 @@ export function useWeddingCalculator({ weddingCosts, saveAllWeddingCosts }: UseW
     setJustSaved(false);
   };
 
+  const handleLabelChange = (key: string, newLabel: string) => {
+    // Don't allow changing fixed category labels in presets mode
+    if (mode === 'presets' && FIXED_CATEGORY_KEYS.includes(key)) return;
+    
+    setLocalCosts(prev => ({
+      ...prev,
+      [key]: {
+        ...prev[key],
+        label: newLabel,
+      },
+    }));
+    setHasChanges(true);
+    setJustSaved(false);
+  };
+
   const handleScenario = (scenario: keyof typeof SCENARIOS) => {
     if (mode !== 'presets') return;
     
@@ -248,6 +263,7 @@ export function useWeddingCalculator({ weddingCosts, saveAllWeddingCosts }: UseW
     setNewCategoryName,
     handleModeChange,
     handleInputChange,
+    handleLabelChange,
     handleScenario,
     handleAddCategory,
     handleRemoveCategory,

@@ -11,6 +11,8 @@ export interface CoupleProfile {
   partner_name: string | null;
   user_name: string | null;
   combined_income: number;
+  user_income: number;
+  partner_income: number;
   wedding_date: string | null;
 }
 

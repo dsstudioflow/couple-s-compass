@@ -2,18 +2,20 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Receipt, Plus, Trash2 } from "lucide-react";
+import { Receipt, Plus } from "lucide-react";
+import { EditableCostRow } from "./recurring-costs/EditableCostRow";
 
 interface RecurringCostsProps {
   data: {
     recurringCosts: { id: string; name: string; amount: number; category: string }[];
     addRecurringCost: (cost: { name: string; amount: number; category: string }) => Promise<{ id: string } | null>;
+    updateRecurringCost: (id: string, updates: { name?: string; amount?: number }) => Promise<boolean>;
     deleteRecurringCost: (id: string) => Promise<boolean>;
   };
 }
 
 export function RecurringCosts({ data }: RecurringCostsProps) {
-  const { recurringCosts, addRecurringCost, deleteRecurringCost } = data;
+  const { recurringCosts, addRecurringCost, updateRecurringCost, deleteRecurringCost } = data;
   const [newName, setNewName] = useState("");
   const [newAmount, setNewAmount] = useState("");
 
@@ -73,23 +75,13 @@ export function RecurringCosts({ data }: RecurringCostsProps) {
         {recurringCosts.length > 0 ? (
           <div className="space-y-2">
             {recurringCosts.map((cost) => (
-              <div 
+              <EditableCostRow
                 key={cost.id}
-                className="flex items-center justify-between p-3 md:p-4 rounded-xl bg-muted/30 border border-border/50 group"
-              >
-                <span className="font-medium text-sm md:text-base truncate mr-2">{cost.name}</span>
-                <div className="flex items-center gap-2 md:gap-3 shrink-0">
-                  <span className="text-muted-foreground text-sm md:text-base">{formatCurrency(cost.amount)}</span>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity"
-                    onClick={() => deleteRecurringCost(cost.id)}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
+                cost={cost}
+                onUpdate={updateRecurringCost}
+                onDelete={deleteRecurringCost}
+                formatCurrency={formatCurrency}
+              />
             ))}
             
             {/* Total */}
