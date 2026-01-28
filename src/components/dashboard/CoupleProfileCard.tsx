@@ -8,8 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Badge } from "@/components/ui/badge";
-import { Users, CalendarIcon, Mail, UserPlus, Check, Clock, Heart } from "lucide-react";
+import { Users, CalendarIcon, Mail, UserPlus, Check, Clock, Heart, X, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
 import type { CoupleProfile } from "@/hooks/useCoupleData";
 
 interface CoupleProfileCardProps {
@@ -21,6 +22,7 @@ interface CoupleProfileCardProps {
 
 export function CoupleProfileCard({ data }: CoupleProfileCardProps) {
   const { coupleProfile, updateProfile } = data;
+  const { toast } = useToast();
   const [partnerEmail, setPartnerEmail] = useState(coupleProfile?.partner_email || "");
   const [partnerName, setPartnerName] = useState(coupleProfile?.partner_name || "");
   const [saving, setSaving] = useState(false);
@@ -34,13 +36,62 @@ export function CoupleProfileCard({ data }: CoupleProfileCardProps) {
     }
   };
 
+  const validateEmail = (email: string) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+
   const handlePartnerInvite = async () => {
-    if (!partnerEmail.trim()) return;
+    const email = partnerEmail.trim();
+    
+    if (!email) {
+      toast({
+        title: "Erro",
+        description: "Digite o e-mail do parceiro(a)",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!validateEmail(email)) {
+      toast({
+        title: "Erro",
+        description: "Digite um e-mail válido",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setSaving(true);
-    await updateProfile({
-      partner_email: partnerEmail.trim(),
+    const success = await updateProfile({
+      partner_email: email,
       partner_name: partnerName.trim() || null,
     });
+
+    if (success) {
+      toast({
+        title: "Convite enviado!",
+        description: `Quando ${partnerName || "seu parceiro(a)"} criar uma conta com o e-mail ${email}, vocês serão vinculados automaticamente.`,
+      });
+    }
+    setSaving(false);
+  };
+
+  const handleCancelInvite = async () => {
+    setSaving(true);
+    const success = await updateProfile({
+      partner_email: null,
+      partner_name: null,
+      partner_user_id: null,
+    });
+
+    if (success) {
+      setPartnerEmail("");
+      setPartnerName("");
+      toast({
+        title: "Convite cancelado",
+        description: "O convite foi removido com sucesso.",
+      });
+    }
     setSaving(false);
   };
 
@@ -114,59 +165,91 @@ export function CoupleProfileCard({ data }: CoupleProfileCardProps) {
             <Label className="text-xs md:text-sm font-medium text-muted-foreground">Vincular Parceiro(a)</Label>
             
             {isPartnerLinked ? (
-              <div className="p-4 md:p-5 bg-gradient-to-br from-success/5 to-success/10 rounded-xl md:rounded-2xl border border-success/20 flex items-center gap-3 md:gap-4">
-                <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-success/10 flex items-center justify-center shrink-0">
-                  <Check className="w-5 h-5 md:w-6 md:h-6 text-success" />
+              <div className="p-4 md:p-5 bg-gradient-to-br from-emerald-500/5 to-emerald-500/10 rounded-xl md:rounded-2xl border border-emerald-500/20 flex items-center gap-3 md:gap-4">
+                <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center shrink-0">
+                  <Check className="w-5 h-5 md:w-6 md:h-6 text-emerald-500" />
                 </div>
-                <div className="min-w-0">
-                  <p className="font-display font-semibold text-base md:text-lg truncate">{coupleProfile?.partner_name || "Parceiro(a)"}</p>
+                <div className="min-w-0 flex-1">
+                  <p className="font-display font-semibold text-base md:text-lg truncate">
+                    {coupleProfile?.partner_name || "Parceiro(a)"}
+                  </p>
                   <p className="text-xs md:text-sm text-muted-foreground">Vinculado com sucesso</p>
                 </div>
               </div>
-            ) : (
-              <>
-                <div className="space-y-2 md:space-y-3">
-                  <Input
-                    placeholder="Nome do parceiro(a)"
-                    value={partnerName}
-                    onChange={(e) => setPartnerName(e.target.value)}
-                    className="h-11 md:h-12 rounded-xl border-border/50 text-sm md:text-base"
-                  />
-                  <div className="flex gap-2">
-                    <Input
-                      type="email"
-                      inputMode="email"
-                      placeholder="Email do parceiro(a)"
-                      value={partnerEmail}
-                      onChange={(e) => setPartnerEmail(e.target.value)}
-                      className="h-11 md:h-12 rounded-xl border-border/50 text-sm md:text-base"
-                    />
-                    <Button 
-                      onClick={handlePartnerInvite} 
-                      disabled={saving || !partnerEmail.trim()}
-                      size="icon"
-                      className="h-11 w-11 md:h-12 md:w-12 rounded-xl shrink-0"
-                    >
-                      <UserPlus className="w-4 h-4 md:w-5 md:h-5" />
-                    </Button>
-                  </div>
-                </div>
-
-                {hasPendingInvite && (
-                  <div className="p-3 md:p-4 bg-warning/5 rounded-xl md:rounded-2xl border border-warning/20 flex items-center gap-2 md:gap-3">
-                    <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-warning/10 flex items-center justify-center shrink-0">
-                      <Clock className="w-4 h-4 md:w-5 md:h-5 text-warning" />
+            ) : hasPendingInvite ? (
+              <div className="space-y-3">
+                <div className="p-4 md:p-5 bg-amber-500/5 rounded-xl md:rounded-2xl border border-amber-500/20">
+                  <div className="flex items-start gap-3 md:gap-4">
+                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-amber-500/10 flex items-center justify-center shrink-0">
+                      <Clock className="w-5 h-5 md:w-6 md:h-6 text-amber-500" />
                     </div>
-                    <div className="min-w-0">
-                      <p className="font-medium text-xs md:text-sm">Convite pendente</p>
-                      <p className="text-[10px] md:text-xs text-muted-foreground flex items-center gap-1 truncate">
-                        <Mail className="w-3 h-3 shrink-0" />
-                        {coupleProfile?.partner_email}
+                    <div className="min-w-0 flex-1">
+                      <p className="font-medium text-sm md:text-base">Aguardando vinculação</p>
+                      <p className="text-xs md:text-sm text-muted-foreground mt-0.5">
+                        {coupleProfile?.partner_name && (
+                          <span className="block">{coupleProfile.partner_name}</span>
+                        )}
+                        <span className="flex items-center gap-1 mt-1">
+                          <Mail className="w-3 h-3 shrink-0" />
+                          {coupleProfile?.partner_email}
+                        </span>
+                      </p>
+                      <p className="text-[10px] md:text-xs text-muted-foreground mt-2 leading-relaxed">
+                        Quando essa pessoa criar uma conta com este e-mail, vocês serão vinculados automaticamente.
                       </p>
                     </div>
                   </div>
-                )}
-              </>
+                </div>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleCancelInvite}
+                  disabled={saving}
+                  className="w-full text-destructive hover:text-destructive hover:bg-destructive/10"
+                >
+                  {saving ? (
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  ) : (
+                    <X className="w-4 h-4 mr-2" />
+                  )}
+                  Cancelar convite
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-2 md:space-y-3">
+                <Input
+                  placeholder="Nome do parceiro(a)"
+                  value={partnerName}
+                  onChange={(e) => setPartnerName(e.target.value)}
+                  className="h-11 md:h-12 rounded-xl border-border/50 text-sm md:text-base"
+                />
+                <div className="flex gap-2">
+                  <Input
+                    type="email"
+                    inputMode="email"
+                    placeholder="Email do parceiro(a)"
+                    value={partnerEmail}
+                    onChange={(e) => setPartnerEmail(e.target.value)}
+                    className="h-11 md:h-12 rounded-xl border-border/50 text-sm md:text-base"
+                  />
+                  <Button 
+                    onClick={handlePartnerInvite} 
+                    disabled={saving || !partnerEmail.trim()}
+                    size="icon"
+                    className="h-11 w-11 md:h-12 md:w-12 rounded-xl shrink-0"
+                  >
+                    {saving ? (
+                      <Loader2 className="w-4 h-4 md:w-5 md:h-5 animate-spin" />
+                    ) : (
+                      <UserPlus className="w-4 h-4 md:w-5 md:h-5" />
+                    )}
+                  </Button>
+                </div>
+                <p className="text-[10px] md:text-xs text-muted-foreground">
+                  Digite o e-mail que seu parceiro(a) usará para criar a conta. 
+                  Vocês serão vinculados automaticamente.
+                </p>
+              </div>
             )}
           </div>
         </div>
