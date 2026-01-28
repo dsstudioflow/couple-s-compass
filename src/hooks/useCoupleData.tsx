@@ -14,6 +14,7 @@ export interface CoupleProfile {
   user_income: number;
   partner_income: number;
   wedding_date: string | null;
+  avatar_url: string | null;
 }
 
 export interface WeddingCost {

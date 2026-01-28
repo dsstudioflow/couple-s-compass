@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       couple_profiles: {
         Row: {
+          avatar_url: string | null
           combined_income: number | null
           created_at: string | null
           id: string
@@ -30,6 +31,7 @@ export type Database = {
           wedding_date: string | null
         }
         Insert: {
+          avatar_url?: string | null
           combined_income?: number | null
           created_at?: string | null
           id?: string
@@ -44,6 +46,7 @@ export type Database = {
           wedding_date?: string | null
         }
         Update: {
+          avatar_url?: string | null
           combined_income?: number | null
           created_at?: string | null
           id?: string
