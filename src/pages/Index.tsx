@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { BottomNav } from "@/components/BottomNav";
 import { DashboardContent } from "@/components/DashboardContent";
+import { ProfileDropdown } from "@/components/profile/ProfileDropdown";
 import { Loader2, Sparkles } from "lucide-react";
 
 const Index = () => {
@@ -41,7 +42,7 @@ const Index = () => {
         <div className="absolute -bottom-1/2 -left-1/2 w-full h-full bg-gradient-to-tr from-accent/5 via-transparent to-transparent rounded-full blur-3xl" />
       </div>
 
-      <header className="relative h-14 md:h-16 border-b border-border/50 flex items-center px-4 md:px-6 bg-background/80 backdrop-blur-xl sticky top-0 z-10 safe-top">
+      <header className="relative h-14 md:h-16 border-b border-border/50 flex items-center justify-between px-4 md:px-6 bg-background/80 backdrop-blur-xl sticky top-0 z-10 safe-top">
         <div className="flex items-center gap-2 md:gap-3">
           <div className="w-8 h-8 md:w-9 md:h-9 rounded-xl gradient-primary flex items-center justify-center shadow-glow-sm shrink-0">
             <Sparkles className="w-4 h-4 md:w-5 md:h-5 text-white" />
@@ -55,6 +56,8 @@ const Index = () => {
             </p>
           </div>
         </div>
+        
+        <ProfileDropdown />
       </header>
 
       <main className="relative px-3 py-4 md:p-6 lg:p-8 pb-32 md:pb-28 max-w-7xl mx-auto">
