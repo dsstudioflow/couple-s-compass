@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useTheme } from "next-themes";
@@ -13,7 +14,8 @@ import {
   Sun, 
   Moon, 
   LogOut,
-  ChevronUp
+  ChevronUp,
+  Sofa
 } from "lucide-react";
 
 const menuItems = [
@@ -36,6 +38,7 @@ const scrollToSection = (id: string) => {
 };
 
 export function BottomNav() {
+  const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
   const { signOut } = useAuth();
   const [activeSection, setActiveSection] = useState("viability");
@@ -165,6 +168,25 @@ export function BottomNav() {
               <ChevronUp className={`h-5 w-5 transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`} />
             </Button>
           </div>
+          
+          <div className="w-px h-8 bg-border mx-1 md:mx-2" />
+
+          {/* Home Builder button */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="rounded-xl h-11 w-11 md:h-12 md:w-12 hover:bg-success/10 hover:text-success transition-all duration-200 no-select active:scale-95"
+                onClick={() => navigate("/home-builder")}
+              >
+                <Sofa className="h-5 w-5" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="top" className="mb-2 hidden md:block">
+              Construindo o Lar
+            </TooltipContent>
+          </Tooltip>
           
           <div className="w-px h-8 bg-border mx-1 md:mx-2" />
           

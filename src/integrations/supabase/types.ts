@@ -62,6 +62,68 @@ export type Database = {
         }
         Relationships: []
       }
+      home_items: {
+        Row: {
+          actual_price: number | null
+          couple_id: string
+          created_at: string
+          estimated_price: number | null
+          id: string
+          image_url: string | null
+          item_type: string
+          name: string
+          notes: string | null
+          priority: string | null
+          purchased_at: string | null
+          room: string
+          status: string | null
+          store_link: string | null
+          updated_at: string
+        }
+        Insert: {
+          actual_price?: number | null
+          couple_id: string
+          created_at?: string
+          estimated_price?: number | null
+          id?: string
+          image_url?: string | null
+          item_type: string
+          name: string
+          notes?: string | null
+          priority?: string | null
+          purchased_at?: string | null
+          room: string
+          status?: string | null
+          store_link?: string | null
+          updated_at?: string
+        }
+        Update: {
+          actual_price?: number | null
+          couple_id?: string
+          created_at?: string
+          estimated_price?: number | null
+          id?: string
+          image_url?: string | null
+          item_type?: string
+          name?: string
+          notes?: string | null
+          priority?: string | null
+          purchased_at?: string | null
+          room?: string
+          status?: string | null
+          store_link?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "home_items_couple_id_fkey"
+            columns: ["couple_id"]
+            isOneToOne: false
+            referencedRelation: "couple_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       housing_config: {
         Row: {
           couple_id: string
