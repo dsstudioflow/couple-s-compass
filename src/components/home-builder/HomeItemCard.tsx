@@ -15,7 +15,7 @@ import {
   Pencil, 
   Trash2, 
   Package,
-  ImageIcon
+  Gift
 } from "lucide-react";
 import { HomeItem } from "./types";
 import { ROOMS, ITEM_TYPES, PRIORITIES } from "@/hooks/useHomeItems";
@@ -38,7 +38,7 @@ export function HomeItemCard({ item, onToggleStatus, onEdit, onDelete }: HomeIte
   return (
     <Card className={`group relative overflow-hidden transition-all duration-200 hover:shadow-lg ${
       item.status === "purchased" ? "bg-success/5 border-success/30" : ""
-    }`}>
+    } ${item.is_gifted ? "ring-2 ring-success/50" : ""}`}>
       {/* Image or placeholder */}
       <div className="relative h-32 bg-gradient-to-br from-muted/50 to-muted overflow-hidden">
         {item.image_url ? (
@@ -99,12 +99,22 @@ export function HomeItemCard({ item, onToggleStatus, onEdit, onDelete }: HomeIte
         </div>
 
         {/* Priority badge */}
-        {item.priority === "high" && (
+        {item.priority === "high" && !item.is_gifted && (
           <Badge 
             variant="destructive" 
             className="absolute bottom-2 right-2 text-[10px] px-1.5 py-0.5"
           >
             Prioridade
+          </Badge>
+        )}
+
+        {/* Gifted badge */}
+        {item.is_gifted && (
+          <Badge 
+            className="absolute bottom-2 right-2 text-[10px] px-1.5 py-0.5 bg-success text-success-foreground"
+          >
+            <Gift className="w-3 h-3 mr-1" />
+            Presenteado
           </Badge>
         )}
       </div>

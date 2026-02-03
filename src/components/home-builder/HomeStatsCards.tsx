@@ -1,6 +1,6 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Package, ShoppingCart, CheckCircle2, TrendingUp } from "lucide-react";
+import { Package, ShoppingCart, CheckCircle2, TrendingUp, Gift } from "lucide-react";
 
 interface HomeStatsCardsProps {
   stats: {
@@ -9,6 +9,8 @@ interface HomeStatsCardsProps {
     pendingItems: number;
     totalEstimated: number;
     totalActual: number;
+    giftedItems: number;
+    giftedSavings: number;
   };
 }
 
@@ -26,7 +28,7 @@ export function HomeStatsCards({ stats }: HomeStatsCardsProps) {
     : 0;
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+    <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 md:gap-4">
       {/* Total Items */}
       <Card className="border-0 shadow-md">
         <CardContent className="p-4">
@@ -70,6 +72,23 @@ export function HomeStatsCards({ stats }: HomeStatsCardsProps) {
             <div className="min-w-0">
               <p className="text-lg md:text-2xl font-display font-bold truncate">{formatCurrency(stats.totalEstimated)}</p>
               <p className="text-xs text-muted-foreground">Orçamento total</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Gifted Items */}
+      <Card className="border-0 shadow-md bg-gradient-to-br from-success/5 to-success/10">
+        <CardContent className="p-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-success/20 flex items-center justify-center shrink-0">
+              <Gift className="w-5 h-5 text-success" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-lg md:text-2xl font-display font-bold truncate text-success">
+                {formatCurrency(stats.giftedSavings)}
+              </p>
+              <p className="text-xs text-muted-foreground">{stats.giftedItems} presenteados</p>
             </div>
           </div>
         </CardContent>

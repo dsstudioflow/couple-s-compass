@@ -70,6 +70,7 @@ export type Database = {
           estimated_price: number | null
           id: string
           image_url: string | null
+          is_gifted: boolean
           item_type: string
           name: string
           notes: string | null
@@ -87,6 +88,7 @@ export type Database = {
           estimated_price?: number | null
           id?: string
           image_url?: string | null
+          is_gifted?: boolean
           item_type: string
           name: string
           notes?: string | null
@@ -104,6 +106,7 @@ export type Database = {
           estimated_price?: number | null
           id?: string
           image_url?: string | null
+          is_gifted?: boolean
           item_type?: string
           name?: string
           notes?: string | null
