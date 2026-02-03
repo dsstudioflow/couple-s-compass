@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -25,9 +24,10 @@ interface HomeItemCardProps {
   onToggleStatus: (id: string) => void;
   onEdit: (item: HomeItem) => void;
   onDelete: (id: string) => void;
+  onToggleGifted: (id: string, isGifted: boolean) => void;
 }
 
-export function HomeItemCard({ item, onToggleStatus, onEdit, onDelete }: HomeItemCardProps) {
+export function HomeItemCard({ item, onToggleStatus, onEdit, onDelete, onToggleGifted }: HomeItemCardProps) {
   const roomLabel = ROOMS.find(r => r.key === item.room)?.label || item.room;
   const typeLabel = ITEM_TYPES.find(t => t.key === item.item_type)?.label || item.item_type;
   const priority = PRIORITIES.find(p => p.key === item.priority);
@@ -79,14 +79,6 @@ export function HomeItemCard({ item, onToggleStatus, onEdit, onDelete }: HomeIte
                 <Pencil className="mr-2 h-4 w-4" />
                 Editar
               </DropdownMenuItem>
-              {item.store_link && (
-                <DropdownMenuItem asChild>
-                  <a href={item.store_link} target="_blank" rel="noopener noreferrer">
-                    <ExternalLink className="mr-2 h-4 w-4" />
-                    Ver na loja
-                  </a>
-                </DropdownMenuItem>
-              )}
               <DropdownMenuItem 
                 onClick={() => onDelete(item.id)}
                 className="text-destructive focus:text-destructive"
@@ -142,7 +134,7 @@ export function HomeItemCard({ item, onToggleStatus, onEdit, onDelete }: HomeIte
         {/* Prices */}
         <div className="flex items-center justify-between pt-1 border-t border-border/50">
           <div className="text-xs">
-            <span className="text-muted-foreground">Estimado: </span>
+            <span className="text-muted-foreground">Est: </span>
             <span className="font-medium">{formatCurrency(item.estimated_price)}</span>
           </div>
           {item.actual_price > 0 && (
@@ -155,6 +147,42 @@ export function HomeItemCard({ item, onToggleStatus, onEdit, onDelete }: HomeIte
               </span>
             </div>
           )}
+        </div>
+
+        {/* Action buttons */}
+        <div className="flex gap-2 pt-2">
+          {item.store_link ? (
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex-1 h-8 text-xs"
+              asChild
+            >
+              <a href={item.store_link} target="_blank" rel="noopener noreferrer">
+                <ExternalLink className="w-3 h-3 mr-1" />
+                Ver na loja
+              </a>
+            </Button>
+          ) : (
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex-1 h-8 text-xs opacity-50"
+              disabled
+            >
+              <ExternalLink className="w-3 h-3 mr-1" />
+              Sem link
+            </Button>
+          )}
+          <Button
+            variant={item.is_gifted ? "default" : "outline"}
+            size="sm"
+            className={`flex-1 h-8 text-xs ${item.is_gifted ? "bg-success hover:bg-success/90 text-success-foreground" : ""}`}
+            onClick={() => onToggleGifted(item.id, !item.is_gifted)}
+          >
+            <Gift className="w-3 h-3 mr-1" />
+            {item.is_gifted ? "Presenteado" : "Presentear"}
+          </Button>
         </div>
       </CardContent>
     </Card>

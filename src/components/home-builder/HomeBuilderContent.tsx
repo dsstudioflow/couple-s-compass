@@ -156,6 +156,7 @@ export function HomeBuilderContent() {
                   onToggleStatus={toggleStatus}
                   onEdit={handleEdit}
                   onDelete={deleteItem}
+                  onToggleGifted={(id, isGifted) => updateItem(id, { is_gifted: isGifted })}
                 />
               ))}
               {filteredItems.length === 0 && (
