@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -16,9 +16,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Camera, Link, Loader2, X } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Camera, Link, Loader2, X, Gift } from "lucide-react";
 import { HomeItem } from "./types";
 import { ROOMS, ITEM_TYPES, PRIORITIES, NewHomeItem } from "@/hooks/useHomeItems";
+
+const getDefaultFormData = () => ({
+  name: "",
+  room: "sala",
+  item_type: "moveis",
+  estimated_price: "",
+  actual_price: "",
+  priority: "medium",
+  store_link: "",
+  notes: "",
+  is_gifted: false,
+});
 
 interface AddItemDialogProps {
   open: boolean;
@@ -42,46 +55,32 @@ export function AddItemDialog({
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [formData, setFormData] = useState({
-    name: "",
-    room: "sala",
-    item_type: "moveis",
-    estimated_price: "",
-    actual_price: "",
-    priority: "medium",
-    store_link: "",
-    notes: "",
-  });
+  const [formData, setFormData] = useState(getDefaultFormData);
 
-  // Reset form when dialog opens/closes or editItem changes
-  useState(() => {
-    if (open && editItem) {
-      setFormData({
-        name: editItem.name,
-        room: editItem.room,
-        item_type: editItem.item_type,
-        estimated_price: editItem.estimated_price?.toString() || "",
-        actual_price: editItem.actual_price?.toString() || "",
-        priority: editItem.priority,
-        store_link: editItem.store_link || "",
-        notes: editItem.notes || "",
-      });
-      setImagePreview(editItem.image_url);
-    } else if (open) {
-      setFormData({
-        name: "",
-        room: "sala",
-        item_type: "moveis",
-        estimated_price: "",
-        actual_price: "",
-        priority: "medium",
-        store_link: "",
-        notes: "",
-      });
-      setImagePreview(null);
-      setImageFile(null);
+  // Reset form when dialog opens or editItem changes
+  useEffect(() => {
+    if (open) {
+      if (editItem) {
+        setFormData({
+          name: editItem.name,
+          room: editItem.room,
+          item_type: editItem.item_type,
+          estimated_price: editItem.estimated_price?.toString() || "",
+          actual_price: editItem.actual_price?.toString() || "",
+          priority: editItem.priority,
+          store_link: editItem.store_link || "",
+          notes: editItem.notes || "",
+          is_gifted: editItem.is_gifted || false,
+        });
+        setImagePreview(editItem.image_url);
+        setImageFile(null);
+      } else {
+        setFormData(getDefaultFormData());
+        setImagePreview(null);
+        setImageFile(null);
+      }
     }
-  });
+  }, [open, editItem]);
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -121,6 +120,7 @@ export function AddItemDialog({
           store_link: formData.store_link || null,
           notes: formData.notes || null,
           image_url: imageUrl,
+          is_gifted: formData.is_gifted,
         });
       } else {
         // Create new item
@@ -136,6 +136,7 @@ export function AddItemDialog({
           status: "pending",
           purchased_at: null,
           image_url: null,
+          is_gifted: formData.is_gifted,
         });
 
         // Upload image if selected
@@ -294,6 +295,21 @@ export function AddItemDialog({
                 ))}
               </SelectContent>
             </Select>
+          </div>
+
+          {/* Gifted toggle */}
+          <div className="flex items-center justify-between p-3 rounded-xl bg-success/10 border border-success/20">
+            <div className="flex items-center gap-3">
+              <Gift className="h-5 w-5 text-success" />
+              <div>
+                <Label className="text-sm font-medium">Presenteado</Label>
+                <p className="text-xs text-muted-foreground">Ganhou de presente e economizou</p>
+              </div>
+            </div>
+            <Switch
+              checked={formData.is_gifted}
+              onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_gifted: checked }))}
+            />
           </div>
 
           {/* Store link */}

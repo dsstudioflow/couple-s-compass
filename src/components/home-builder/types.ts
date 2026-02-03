@@ -12,6 +12,7 @@ export interface HomeItem {
   image_url: string | null;
   notes: string | null;
   purchased_at: string | null;
+  is_gifted: boolean;
   created_at: string;
   updated_at: string;
 }

@@ -17,6 +17,7 @@ export interface HomeItem {
   image_url: string | null;
   notes: string | null;
   purchased_at: string | null;
+  is_gifted: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -103,6 +104,7 @@ export function useHomeItems(coupleId: string | undefined) {
           image_url: item.image_url ?? null,
           notes: item.notes ?? null,
           purchased_at: item.purchased_at ?? null,
+          is_gifted: item.is_gifted ?? false,
         })
         .select()
         .single();
@@ -200,12 +202,15 @@ export function useHomeItems(coupleId: string | undefined) {
   };
 
   // Computed stats
+  const giftedItems = items.filter(i => i.is_gifted);
   const stats = {
     totalItems: items.length,
     purchasedItems: items.filter(i => i.status === "purchased").length,
     pendingItems: items.filter(i => i.status === "pending").length,
     totalEstimated: items.reduce((sum, i) => sum + (i.estimated_price || 0), 0),
-    totalActual: items.reduce((sum, i) => sum + (i.actual_price || 0), 0),
+    totalActual: items.filter(i => !i.is_gifted).reduce((sum, i) => sum + (i.actual_price || 0), 0),
+    giftedItems: giftedItems.length,
+    giftedSavings: giftedItems.reduce((sum, i) => sum + (i.estimated_price || 0), 0),
     byRoom: ROOMS.map(room => ({
       room: room.label,
       key: room.key,
