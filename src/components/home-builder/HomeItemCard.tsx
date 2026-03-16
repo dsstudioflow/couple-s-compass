@@ -14,7 +14,8 @@ import {
   Pencil, 
   Trash2, 
   Package,
-  Gift
+  Gift,
+  Wallet
 } from "lucide-react";
 import { HomeItem } from "./types";
 import { ROOMS, ITEM_TYPES, PRIORITIES } from "@/hooks/useHomeItems";
@@ -34,6 +35,8 @@ export function HomeItemCard({ item, onToggleStatus, onEdit, onDelete, onToggleG
 
   const formatCurrency = (value: number) =>
     new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
+
+  const isPaid = item.status === "purchased" && !item.is_gifted;
 
   return (
     <Card className={`group relative overflow-hidden transition-all duration-200 hover:shadow-lg ${
@@ -90,17 +93,7 @@ export function HomeItemCard({ item, onToggleStatus, onEdit, onDelete, onToggleG
           </DropdownMenu>
         </div>
 
-        {/* Priority badge */}
-        {item.priority === "high" && !item.is_gifted && (
-          <Badge 
-            variant="destructive" 
-            className="absolute bottom-2 right-2 text-[10px] px-1.5 py-0.5"
-          >
-            Prioridade
-          </Badge>
-        )}
-
-        {/* Gifted badge */}
+        {/* Status badges */}
         {item.is_gifted && (
           <Badge 
             className="absolute bottom-2 right-2 text-[10px] px-1.5 py-0.5 bg-success text-success-foreground"
@@ -109,10 +102,26 @@ export function HomeItemCard({ item, onToggleStatus, onEdit, onDelete, onToggleG
             Presenteado
           </Badge>
         )}
+        {isPaid && (
+          <Badge 
+            className="absolute bottom-2 right-2 text-[10px] px-1.5 py-0.5 bg-primary text-primary-foreground"
+          >
+            <Wallet className="w-3 h-3 mr-1" />
+            Pago
+          </Badge>
+        )}
+        {item.priority === "high" && !item.is_gifted && !isPaid && (
+          <Badge 
+            variant="destructive" 
+            className="absolute bottom-2 right-2 text-[10px] px-1.5 py-0.5"
+          >
+            Prioridade
+          </Badge>
+        )}
       </div>
 
       <CardContent className="p-3 space-y-2">
-        {/* Title and status */}
+        {/* Title */}
         <div className="flex items-start justify-between gap-2">
           <h3 className={`font-medium text-sm line-clamp-1 ${
             item.status === "purchased" ? "line-through text-muted-foreground" : ""
@@ -160,7 +169,7 @@ export function HomeItemCard({ item, onToggleStatus, onEdit, onDelete, onToggleG
             >
               <a href={item.store_link} target="_blank" rel="noopener noreferrer">
                 <ExternalLink className="w-3 h-3 mr-1" />
-                Ver na loja
+                Loja
               </a>
             </Button>
           ) : (
@@ -171,9 +180,18 @@ export function HomeItemCard({ item, onToggleStatus, onEdit, onDelete, onToggleG
               disabled
             >
               <ExternalLink className="w-3 h-3 mr-1" />
-              Sem link
+              Loja
             </Button>
           )}
+          <Button
+            variant={isPaid ? "default" : "outline"}
+            size="sm"
+            className={`flex-1 h-8 text-xs ${isPaid ? "bg-primary hover:bg-primary/90" : ""}`}
+            onClick={() => onToggleStatus(item.id)}
+          >
+            <Wallet className="w-3 h-3 mr-1" />
+            {isPaid ? "Pago" : "Pagar"}
+          </Button>
           <Button
             variant={item.is_gifted ? "default" : "outline"}
             size="sm"
@@ -181,7 +199,7 @@ export function HomeItemCard({ item, onToggleStatus, onEdit, onDelete, onToggleG
             onClick={() => onToggleGifted(item.id, !item.is_gifted)}
           >
             <Gift className="w-3 h-3 mr-1" />
-            {item.is_gifted ? "Presenteado" : "Presentear"}
+            {item.is_gifted ? "🎁" : "🎁"}
           </Button>
         </div>
       </CardContent>
