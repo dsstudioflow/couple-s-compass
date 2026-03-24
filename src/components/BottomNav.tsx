@@ -104,7 +104,7 @@ export function BottomNav() {
             : 'opacity-0 scale-95 translate-y-4 pointer-events-none'
         }`}
       >
-        <div className="flex justify-center gap-2 p-3 rounded-2xl bg-card/95 backdrop-blur-xl border border-border/50 shadow-xl">
+        <div className="flex justify-center gap-2 p-3 rounded-2xl bg-card/95 backdrop-blur-xl border border-border/40 shadow-xl">
           {secondaryItems.map((item) => {
             const isActive = activeSection === item.id;
             return (
@@ -128,7 +128,7 @@ export function BottomNav() {
 
       {/* Main navigation bar */}
       <div className="mx-4 mb-4 md:mx-auto md:max-w-fit">
-        <div className="flex items-center justify-between gap-1 px-2 py-2 md:px-4 md:py-3 rounded-2xl bg-card/95 backdrop-blur-xl border border-border/50 shadow-xl shadow-black/10 dark:shadow-black/30">
+        <div className="flex items-center justify-between gap-1 px-2 py-2 md:px-4 md:py-3 rounded-2xl bg-card/95 backdrop-blur-xl border border-border/40 shadow-xl shadow-foreground/5">
           {/* Primary navigation items */}
           <div className="flex items-center gap-1">
             {primaryItems.map((item) => {

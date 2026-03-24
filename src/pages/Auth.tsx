@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Sparkles, Loader2, Mail, Lock, User } from "lucide-react";
+import { Loader2, Mail, Lock, User, Heart } from "lucide-react";
 import { z } from "zod";
 
 const authSchema = z.object({
@@ -94,41 +94,40 @@ export default function Auth() {
     } else {
       toast({
         title: "Conta criada!",
-        description: "Bem-vindo ao seu planejador financeiro.",
+        description: "Bem-vindo ao seu planejador.",
       });
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4 relative overflow-hidden">
-      {/* Background decorations */}
+      {/* Soft organic background shapes */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-1/2 -right-1/2 w-full h-full bg-gradient-to-bl from-primary/10 via-transparent to-transparent rounded-full blur-3xl" />
-        <div className="absolute -bottom-1/2 -left-1/2 w-full h-full bg-gradient-to-tr from-accent/10 via-transparent to-transparent rounded-full blur-3xl" />
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-primary/5 rounded-full blur-3xl animate-pulse-soft" />
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-bl from-primary/8 via-transparent to-transparent rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-gradient-to-tr from-accent/8 via-transparent to-transparent rounded-full blur-3xl" />
       </div>
 
-      <Card className="w-full max-w-md animate-fade-in relative border-0 shadow-2xl shadow-primary/10 bg-card/95 backdrop-blur-sm">
+      <Card className="w-full max-w-md animate-fade-in relative border border-border/60 shadow-xl bg-card/95 backdrop-blur-sm">
         <CardHeader className="text-center space-y-4 pb-2">
-          <div className="mx-auto w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center shadow-lg shadow-primary/30">
-            <Sparkles className="w-8 h-8 text-white" />
+          <div className="mx-auto w-14 h-14 rounded-full gradient-accent flex items-center justify-center shadow-md">
+            <Heart className="w-6 h-6 text-white" />
           </div>
           <div>
-            <CardTitle className="font-display text-3xl bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">
-              Planejador Financeiro
+            <CardTitle className="font-display text-3xl italic text-foreground">
+              Nosso Planejamento
             </CardTitle>
-            <CardDescription className="mt-2 text-base">
-              Organize seu futuro a dois com clareza
+            <CardDescription className="mt-2 text-sm">
+              Organize o futuro a dois com delicadeza
             </CardDescription>
           </div>
         </CardHeader>
         <CardContent className="pt-6">
           <Tabs defaultValue="signin" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-2 h-12 rounded-xl bg-muted/50 p-1">
-              <TabsTrigger value="signin" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm font-medium">
+            <TabsList className="grid w-full grid-cols-2 h-11 rounded-lg bg-muted/50 p-1">
+              <TabsTrigger value="signin" className="rounded-md data-[state=active]:bg-card data-[state=active]:shadow-sm font-medium text-sm">
                 Entrar
               </TabsTrigger>
-              <TabsTrigger value="signup" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm font-medium">
+              <TabsTrigger value="signup" className="rounded-md data-[state=active]:bg-card data-[state=active]:shadow-sm font-medium text-sm">
                 Criar Conta
               </TabsTrigger>
             </TabsList>
@@ -136,39 +135,39 @@ export default function Auth() {
             <TabsContent value="signin">
               <form onSubmit={handleSignIn} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="signin-email" className="text-sm text-muted-foreground">Email</Label>
+                  <Label htmlFor="signin-email" className="text-xs text-muted-foreground uppercase tracking-wider">Email</Label>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                     <Input
                       id="signin-email"
                       type="email"
                       placeholder="seu@email.com"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="pl-10 h-12 rounded-xl border-border/50"
+                      className="pl-10 h-12 rounded-lg border-border/60"
                       required
                     />
                   </div>
                   {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signin-password" className="text-sm text-muted-foreground">Senha</Label>
+                  <Label htmlFor="signin-password" className="text-xs text-muted-foreground uppercase tracking-wider">Senha</Label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                     <Input
                       id="signin-password"
                       type="password"
                       placeholder="••••••••"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="pl-10 h-12 rounded-xl border-border/50"
+                      className="pl-10 h-12 rounded-lg border-border/60"
                       required
                     />
                   </div>
                   {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
                 </div>
-                <Button type="submit" className="w-full h-12 rounded-xl text-base font-medium" disabled={loading}>
-                  {loading ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : null}
+                <Button type="submit" className="w-full h-12 rounded-lg text-sm font-medium tracking-wide" disabled={loading}>
+                  {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
                   Entrar
                 </Button>
               </form>
@@ -177,55 +176,55 @@ export default function Auth() {
             <TabsContent value="signup">
               <form onSubmit={handleSignUp} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="signup-name" className="text-sm text-muted-foreground">Seu Nome</Label>
+                  <Label htmlFor="signup-name" className="text-xs text-muted-foreground uppercase tracking-wider">Seu Nome</Label>
                   <div className="relative">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                     <Input
                       id="signup-name"
                       type="text"
                       placeholder="João Silva"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      className="pl-10 h-12 rounded-xl border-border/50"
+                      className="pl-10 h-12 rounded-lg border-border/60"
                       required
                     />
                   </div>
                   {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signup-email" className="text-sm text-muted-foreground">Email</Label>
+                  <Label htmlFor="signup-email" className="text-xs text-muted-foreground uppercase tracking-wider">Email</Label>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                     <Input
                       id="signup-email"
                       type="email"
                       placeholder="seu@email.com"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="pl-10 h-12 rounded-xl border-border/50"
+                      className="pl-10 h-12 rounded-lg border-border/60"
                       required
                     />
                   </div>
                   {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signup-password" className="text-sm text-muted-foreground">Senha</Label>
+                  <Label htmlFor="signup-password" className="text-xs text-muted-foreground uppercase tracking-wider">Senha</Label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                     <Input
                       id="signup-password"
                       type="password"
                       placeholder="Mínimo 6 caracteres"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="pl-10 h-12 rounded-xl border-border/50"
+                      className="pl-10 h-12 rounded-lg border-border/60"
                       required
                     />
                   </div>
                   {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
                 </div>
-                <Button type="submit" className="w-full h-12 rounded-xl text-base font-medium" disabled={loading}>
-                  {loading ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : null}
+                <Button type="submit" className="w-full h-12 rounded-lg text-sm font-medium tracking-wide" disabled={loading}>
+                  {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
                   Criar Conta
                 </Button>
               </form>
