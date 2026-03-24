@@ -25,27 +25,33 @@ export function DashboardContent() {
 
   return (
     <div className="space-y-4 md:space-y-6 lg:space-y-8">
-      <section id="viability" className="animate-fade-in">
+      <section id="viability" className="animate-fade-in" style={{ animationDelay: "0ms" }}>
         <ViabilityCard data={data} />
       </section>
       
-      <section id="couple-profile" className="animate-fade-in" style={{ animationDelay: "100ms" }}>
+      <section id="couple-profile" className="animate-fade-in" style={{ animationDelay: "80ms" }}>
         <CoupleProfileCard data={data} />
       </section>
 
-      <section id="wedding" className="space-y-4 md:space-y-6 animate-fade-in" style={{ animationDelay: "200ms" }}>
+      <section id="wedding" className="space-y-4 md:space-y-6 animate-fade-in" style={{ animationDelay: "160ms" }}>
         <div className="grid gap-4 md:gap-6 lg:grid-cols-2">
-          <WeddingCalculator data={data} />
-          <WeddingPieChart weddingCosts={data.weddingCosts} />
+          <div className="animate-fade-in" style={{ animationDelay: "200ms" }}>
+            <WeddingCalculator data={data} />
+          </div>
+          <div className="animate-fade-in" style={{ animationDelay: "260ms" }}>
+            <WeddingPieChart weddingCosts={data.weddingCosts} />
+          </div>
         </div>
-        <WeddingComparisonChart weddingCosts={data.weddingCosts} />
+        <div className="animate-fade-in" style={{ animationDelay: "320ms" }}>
+          <WeddingComparisonChart weddingCosts={data.weddingCosts} />
+        </div>
       </section>
 
-      <section id="housing" className="animate-fade-in" style={{ animationDelay: "300ms" }}>
+      <section id="housing" className="animate-fade-in" style={{ animationDelay: "380ms" }}>
         <HousingPlanner data={data} />
       </section>
 
-      <section id="recurring" className="animate-fade-in" style={{ animationDelay: "400ms" }}>
+      <section id="recurring" className="animate-fade-in" style={{ animationDelay: "440ms" }}>
         <RecurringCosts data={data} />
       </section>
 

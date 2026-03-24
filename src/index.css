@@ -121,7 +121,12 @@
   }
 }
 
-@layer base {
+/* Smooth theme transitions */
+*, *::before, *::after {
+  transition-property: background-color, border-color, box-shadow;
+  transition-duration: 0.3s;
+  transition-timing-function: ease;
+}
   * {
     @apply border-border;
   }
