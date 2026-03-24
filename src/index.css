@@ -1,125 +1,123 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Bricolage+Grotesque:wght@400;500;600;700&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    /* Modern palette: Deep violet, coral, and neutrals */
-    --background: 240 10% 98%;
-    --foreground: 240 10% 10%;
+    /* Sage & Blush — Minimalist Elegant */
+    --background: 30 27% 96%;
+    --foreground: 109 12% 18%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 240 10% 10%;
+    --card: 30 30% 99%;
+    --card-foreground: 109 12% 18%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 10%;
+    --popover: 30 30% 99%;
+    --popover-foreground: 109 12% 18%;
 
-    /* Primary - Deep violet/indigo */
-    --primary: 250 60% 55%;
+    /* Primary — Sage green */
+    --primary: 99 22% 52%;
     --primary-foreground: 0 0% 100%;
 
-    /* Secondary - Soft neutral */
-    --secondary: 240 10% 94%;
-    --secondary-foreground: 240 10% 30%;
+    /* Secondary — Warm cream */
+    --secondary: 28 35% 92%;
+    --secondary-foreground: 109 12% 26%;
 
-    --muted: 240 10% 96%;
-    --muted-foreground: 240 5% 46%;
+    --muted: 30 20% 94%;
+    --muted-foreground: 25 10% 48%;
 
-    /* Accent - Coral/salmon */
-    --accent: 12 80% 60%;
+    /* Accent — Blush / Rose */
+    --accent: 24 38% 73%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 72% 51%;
+    --destructive: 0 60% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    /* Success - Emerald */
-    --success: 160 70% 42%;
+    /* Success — Deeper sage */
+    --success: 140 30% 42%;
     --success-foreground: 0 0% 100%;
 
-    /* Warning - Amber */
-    --warning: 38 92% 50%;
-    --warning-foreground: 0 0% 10%;
+    /* Warning — Warm amber */
+    --warning: 38 75% 55%;
+    --warning-foreground: 30 20% 12%;
 
-    --border: 240 10% 90%;
-    --input: 240 10% 90%;
-    --ring: 250 60% 55%;
+    --border: 28 20% 88%;
+    --input: 28 20% 88%;
+    --ring: 99 22% 52%;
 
-    --radius: 1rem;
+    --radius: 0.75rem;
 
     /* Sidebar */
-    --sidebar-background: 240 10% 98%;
-    --sidebar-foreground: 240 10% 30%;
-    --sidebar-primary: 250 60% 55%;
+    --sidebar-background: 30 25% 97%;
+    --sidebar-foreground: 109 12% 26%;
+    --sidebar-primary: 99 22% 52%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 250 50% 95%;
-    --sidebar-accent-foreground: 250 60% 45%;
-    --sidebar-border: 240 10% 92%;
-    --sidebar-ring: 250 60% 55%;
+    --sidebar-accent: 28 35% 92%;
+    --sidebar-accent-foreground: 109 12% 26%;
+    --sidebar-border: 28 20% 90%;
+    --sidebar-ring: 99 22% 52%;
 
-    /* Chart colors - vibrant and harmonious */
-    --chart-1: 250 60% 55%;
-    --chart-2: 12 80% 60%;
-    --chart-3: 160 70% 42%;
-    --chart-4: 38 92% 50%;
-    --chart-5: 280 65% 55%;
-    --chart-6: 200 80% 55%;
+    /* Chart colors — organic and warm */
+    --chart-1: 99 22% 52%;
+    --chart-2: 24 38% 73%;
+    --chart-3: 140 30% 42%;
+    --chart-4: 38 75% 55%;
+    --chart-5: 350 35% 62%;
+    --chart-6: 200 30% 55%;
   }
 
   .dark {
-    --background: 240 10% 6%;
-    --foreground: 240 10% 95%;
+    --background: 120 8% 8%;
+    --foreground: 30 15% 92%;
 
-    --card: 240 10% 10%;
-    --card-foreground: 240 10% 95%;
+    --card: 120 8% 11%;
+    --card-foreground: 30 15% 92%;
 
-    --popover: 240 10% 10%;
-    --popover-foreground: 240 10% 95%;
+    --popover: 120 8% 11%;
+    --popover-foreground: 30 15% 92%;
 
-    /* Primary - Brighter violet for dark mode */
-    --primary: 250 70% 65%;
-    --primary-foreground: 240 10% 6%;
+    /* Primary — Lighter sage for dark */
+    --primary: 99 28% 62%;
+    --primary-foreground: 120 8% 8%;
 
     /* Secondary */
-    --secondary: 240 10% 18%;
-    --secondary-foreground: 240 10% 85%;
+    --secondary: 120 6% 18%;
+    --secondary-foreground: 30 15% 85%;
 
-    --muted: 240 10% 15%;
-    --muted-foreground: 240 10% 55%;
+    --muted: 120 6% 15%;
+    --muted-foreground: 30 10% 55%;
 
-    /* Accent - Coral */
-    --accent: 12 75% 55%;
+    /* Accent — Warmer blush */
+    --accent: 24 35% 60%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 62% 50%;
+    --destructive: 0 55% 48%;
     --destructive-foreground: 0 0% 100%;
 
-    --success: 160 65% 45%;
+    --success: 140 28% 48%;
     --success-foreground: 0 0% 100%;
 
-    --warning: 38 85% 55%;
-    --warning-foreground: 0 0% 10%;
+    --warning: 38 70% 58%;
+    --warning-foreground: 30 20% 10%;
 
-    --border: 240 10% 18%;
-    --input: 240 10% 18%;
-    --ring: 250 70% 65%;
+    --border: 120 6% 18%;
+    --input: 120 6% 18%;
+    --ring: 99 28% 62%;
 
-    --sidebar-background: 240 10% 8%;
-    --sidebar-foreground: 240 10% 90%;
-    --sidebar-primary: 250 70% 65%;
-    --sidebar-primary-foreground: 240 10% 6%;
-    --sidebar-accent: 250 40% 18%;
-    --sidebar-accent-foreground: 250 60% 75%;
-    --sidebar-border: 240 10% 15%;
-    --sidebar-ring: 250 70% 65%;
+    --sidebar-background: 120 8% 9%;
+    --sidebar-foreground: 30 15% 88%;
+    --sidebar-primary: 99 28% 62%;
+    --sidebar-primary-foreground: 120 8% 8%;
+    --sidebar-accent: 120 8% 16%;
+    --sidebar-accent-foreground: 99 25% 70%;
+    --sidebar-border: 120 6% 15%;
+    --sidebar-ring: 99 28% 62%;
 
-    --chart-1: 250 70% 65%;
-    --chart-2: 12 75% 55%;
-    --chart-3: 160 65% 50%;
-    --chart-4: 38 85% 55%;
-    --chart-5: 280 60% 60%;
-    --chart-6: 200 75% 60%;
+    --chart-1: 99 28% 62%;
+    --chart-2: 24 35% 60%;
+    --chart-3: 140 28% 52%;
+    --chart-4: 38 70% 58%;
+    --chart-5: 350 30% 58%;
+    --chart-6: 200 28% 58%;
   }
 }
 
@@ -139,15 +137,19 @@
 
 @layer utilities {
   .gradient-primary {
-    background: linear-gradient(135deg, hsl(250 60% 55%) 0%, hsl(280 65% 55%) 100%);
+    background: linear-gradient(135deg, hsl(99 22% 52%) 0%, hsl(140 30% 42%) 100%);
   }
   
   .gradient-accent {
-    background: linear-gradient(135deg, hsl(12 80% 60%) 0%, hsl(38 92% 55%) 100%);
+    background: linear-gradient(135deg, hsl(24 38% 73%) 0%, hsl(350 35% 62%) 100%);
   }
 
   .gradient-success {
-    background: linear-gradient(135deg, hsl(160 70% 42%) 0%, hsl(180 65% 45%) 100%);
+    background: linear-gradient(135deg, hsl(140 30% 42%) 0%, hsl(160 25% 45%) 100%);
+  }
+
+  .gradient-warm {
+    background: linear-gradient(135deg, hsl(28 35% 92%) 0%, hsl(24 38% 85%) 100%);
   }
 
   .glass-effect {
@@ -159,7 +161,7 @@
   }
 
   .glow {
-    box-shadow: 0 0 40px -10px hsl(var(--primary) / 0.3);
+    box-shadow: 0 0 40px -10px hsl(var(--primary) / 0.2);
   }
 
   /* Mobile-first utilities */
@@ -175,20 +177,17 @@
     padding-top: max(1rem, env(safe-area-inset-top));
   }
 
-  /* Prevent text selection on interactive elements for mobile */
   .no-select {
     -webkit-user-select: none;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
   }
 
-  /* Smooth scroll for mobile */
   .scroll-smooth {
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
   }
 
-  /* Hide scrollbar but keep functionality */
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
@@ -204,7 +203,6 @@
     font-size: 15px;
   }
   
-  /* Larger touch targets on mobile */
   button, 
   [role="button"],
   input,
@@ -213,7 +211,6 @@
     min-height: 44px;
   }
 
-  /* Prevent zoom on input focus (iOS) */
   input[type="text"],
   input[type="email"],
   input[type="password"],
