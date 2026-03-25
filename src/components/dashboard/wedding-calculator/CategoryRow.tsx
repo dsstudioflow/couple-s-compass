@@ -41,9 +41,9 @@ export function CategoryRow({
   };
 
   return (
-    <div className="p-3 md:p-2 rounded-xl bg-muted/30 border border-border/50 transition-colors w-full max-w-full">
+    <div className="p-3 md:p-2 rounded-xl bg-muted/30 border border-border/50 transition-colors">
       {/* Mobile layout */}
-      <div className="flex flex-col gap-2 md:hidden w-full max-w-full">
+      <div className="flex flex-col gap-2 md:hidden">
         <div className="flex items-center justify-between">
           {isEditingLabel && !isFixed ? (
             <div className="flex items-center gap-2 flex-1 mr-2">
@@ -118,8 +118,8 @@ export function CategoryRow({
             )}
           </div>
         </div>
-        <div className="flex gap-2">
-          <div className="flex-1 space-y-1" style={{ minWidth: 0 }}>
+        <div className="grid grid-cols-2 gap-2">
+          <div className="space-y-1">
             <span className="text-[10px] text-muted-foreground">Planejado</span>
             <Input
               type="number"
@@ -128,10 +128,9 @@ export function CategoryRow({
               value={category.planned_amount || ""}
               onChange={(e) => onInputChange(category.key, "planned_amount", Number(e.target.value))}
               className="text-sm h-10 rounded-lg border-border/50"
-              style={{ minWidth: 0, width: '100%' }}
             />
           </div>
-          <div className="flex-1 space-y-1" style={{ minWidth: 0 }}>
+          <div className="space-y-1">
             <span className="text-[10px] text-muted-foreground">Real</span>
             <Input
               type="number"
@@ -140,7 +139,6 @@ export function CategoryRow({
               value={category.actual_amount || ""}
               onChange={(e) => onInputChange(category.key, "actual_amount", Number(e.target.value))}
               className="text-sm h-10 rounded-lg border-border/50"
-              style={{ minWidth: 0, width: '100%' }}
             />
           </div>
         </div>
