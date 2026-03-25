@@ -118,7 +118,7 @@ export function CategoryRow({
             )}
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-2 min-w-0">
           <div className="space-y-1">
             <span className="text-[10px] text-muted-foreground">Planejado</span>
             <Input
