@@ -41,9 +41,9 @@ export function CategoryRow({
   };
 
   return (
-    <div className="p-3 md:p-2 rounded-xl bg-muted/30 border border-border/50 transition-colors overflow-hidden">
+    <div className="p-3 md:p-2 rounded-xl bg-muted/30 border border-border/50 transition-colors w-full max-w-full">
       {/* Mobile layout */}
-      <div className="flex flex-col gap-2 md:hidden">
+      <div className="flex flex-col gap-2 md:hidden w-full max-w-full">
         <div className="flex items-center justify-between">
           {isEditingLabel && !isFixed ? (
             <div className="flex items-center gap-2 flex-1 mr-2">
