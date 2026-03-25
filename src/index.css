@@ -141,7 +141,6 @@
     @apply font-display font-semibold tracking-tight;
   }
 }
-}
 
 @layer utilities {
   .gradient-primary {
