@@ -41,7 +41,7 @@ export function CategoryRow({
   };
 
   return (
-    <div className="p-3 md:p-2 rounded-xl bg-muted/30 border border-border/50 transition-colors">
+    <div className="p-3 md:p-2 rounded-xl bg-muted/30 border border-border/50 transition-colors overflow-hidden">
       {/* Mobile layout */}
       <div className="flex flex-col gap-2 md:hidden">
         <div className="flex items-center justify-between">
