@@ -118,8 +118,8 @@ export function CategoryRow({
             )}
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-2 min-w-0">
-          <div className="space-y-1 min-w-0">
+        <div className="flex gap-2">
+          <div className="flex-1 space-y-1" style={{ minWidth: 0 }}>
             <span className="text-[10px] text-muted-foreground">Planejado</span>
             <Input
               type="number"
@@ -127,10 +127,11 @@ export function CategoryRow({
               placeholder="R$ 0"
               value={category.planned_amount || ""}
               onChange={(e) => onInputChange(category.key, "planned_amount", Number(e.target.value))}
-              className="text-sm h-10 rounded-lg border-border/50 w-full min-w-0"
+              className="text-sm h-10 rounded-lg border-border/50"
+              style={{ minWidth: 0, width: '100%' }}
             />
           </div>
-          <div className="space-y-1 min-w-0">
+          <div className="flex-1 space-y-1" style={{ minWidth: 0 }}>
             <span className="text-[10px] text-muted-foreground">Real</span>
             <Input
               type="number"
@@ -138,7 +139,8 @@ export function CategoryRow({
               placeholder="R$ 0"
               value={category.actual_amount || ""}
               onChange={(e) => onInputChange(category.key, "actual_amount", Number(e.target.value))}
-              className="text-sm h-10 rounded-lg border-border/50 w-full min-w-0"
+              className="text-sm h-10 rounded-lg border-border/50"
+              style={{ minWidth: 0, width: '100%' }}
             />
           </div>
         </div>
