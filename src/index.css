@@ -133,6 +133,11 @@
     @apply border-border;
   }
 
+  html, body {
+    @apply overflow-x-hidden;
+    max-width: 100vw;
+  }
+
   body {
     @apply bg-background text-foreground font-sans antialiased;
   }
@@ -214,6 +219,17 @@
   select,
   textarea {
     min-height: 44px;
+  }
+
+  input[type="number"] {
+    -moz-appearance: textfield;
+    max-width: 100%;
+  }
+
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
   }
 
   input[type="text"],
