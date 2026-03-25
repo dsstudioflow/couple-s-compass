@@ -35,7 +35,7 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background scroll-smooth">
+    <div className="min-h-screen bg-background scroll-smooth overflow-x-hidden max-w-[100vw]">
       {/* Subtle organic background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-1/3 -right-1/3 w-2/3 h-2/3 bg-gradient-to-bl from-primary/4 via-transparent to-transparent rounded-full blur-3xl" />
