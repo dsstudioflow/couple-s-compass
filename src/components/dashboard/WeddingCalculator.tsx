@@ -7,6 +7,21 @@ import { AddCategoryInput } from "./wedding-calculator/AddCategoryInput";
 import { TotalsDisplay } from "./wedding-calculator/TotalsDisplay";
 import { useWeddingCalculator } from "./wedding-calculator/useWeddingCalculator";
 import { WeddingCalculatorProps, SCENARIOS } from "./wedding-calculator/types";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  arrayMove,
+} from "@dnd-kit/sortable";
 
 export function WeddingCalculator({ data }: WeddingCalculatorProps) {
   const { weddingCosts, saveAllWeddingCosts } = data;
@@ -15,6 +30,7 @@ export function WeddingCalculator({ data }: WeddingCalculatorProps) {
     mode,
     activeScenario,
     orderedCategories,
+    categoryOrder,
     hasChanges,
     isSaving,
     justSaved,
@@ -28,10 +44,25 @@ export function WeddingCalculator({ data }: WeddingCalculatorProps) {
     handleScenario,
     handleAddCategory,
     handleRemoveCategory,
-    handleMoveCategory,
+    handleReorderCategories,
     handleSave,
     isFixedCategory,
   } = useWeddingCalculator({ weddingCosts, saveAllWeddingCosts });
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 150, tolerance: 5 } }),
+    useSensor(KeyboardSensor)
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      const oldIndex = categoryOrder.indexOf(active.id as string);
+      const newIndex = categoryOrder.indexOf(over.id as string);
+      handleReorderCategories(arrayMove(categoryOrder, oldIndex, newIndex));
+    }
+  };
 
   return (
     <Card className="border-0 shadow-lg shadow-primary/5 overflow-hidden">
@@ -63,7 +94,6 @@ export function WeddingCalculator({ data }: WeddingCalculatorProps) {
           </Button>
         </div>
 
-        {/* Mode Tabs */}
         <Tabs value={mode} onValueChange={(v) => handleModeChange(v as 'presets' | 'custom')} className="w-full">
           <TabsList className="grid w-full grid-cols-2 h-11 p-1 bg-muted/50 rounded-xl">
             <TabsTrigger 
@@ -87,7 +117,6 @@ export function WeddingCalculator({ data }: WeddingCalculatorProps) {
       </CardHeader>
       
       <CardContent className="space-y-4 md:space-y-5 px-4 md:px-6">
-        {/* Scenario buttons - only in presets mode */}
         {mode === 'presets' && (
           <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1 -mx-1 px-1">
             {(["economico", "padrao", "luxo"] as const).map((scenario) => (
@@ -98,33 +127,24 @@ export function WeddingCalculator({ data }: WeddingCalculatorProps) {
                 onClick={() => handleScenario(scenario)}
                 className="rounded-xl shrink-0 text-xs md:text-sm"
               >
-                {scenario === "economico" ? (
-                  <>💰 Econômico</>
-                ) : scenario === "padrao" ? (
-                  <>✨ Padrão</>
-                ) : (
-                  <>👑 Luxo</>
-                )}
+                {scenario === "economico" ? "💰 Econômico" : scenario === "padrao" ? "✨ Padrão" : "👑 Luxo"}
               </Button>
             ))}
           </div>
         )}
 
-        {/* Custom mode empty state */}
         {mode === 'custom' && orderedCategories.length === 0 && (
           <div className="text-center py-8 px-4 rounded-xl bg-muted/30 border border-dashed border-border">
             <Palette className="w-10 h-10 mx-auto text-muted-foreground mb-3" />
             <h3 className="font-display font-semibold text-base mb-1">Modo Personalizado</h3>
             <p className="text-sm text-muted-foreground mb-4">
-              Adicione suas próprias categorias de custos do casamento. Você tem total liberdade para criar e organizar como preferir.
+              Adicione suas próprias categorias de custos do casamento.
             </p>
           </div>
         )}
         
-        {/* Categories list */}
         {orderedCategories.length > 0 && (
           <div className="space-y-2">
-            {/* Header - hidden on mobile, visible on larger screens */}
             <div className="hidden md:grid grid-cols-[auto_1fr_1fr_1fr_auto] gap-3 text-xs font-medium text-muted-foreground px-1">
               <span className="w-10"></span>
               <span>Categoria</span>
@@ -133,33 +153,31 @@ export function WeddingCalculator({ data }: WeddingCalculatorProps) {
               <span className="w-8"></span>
             </div>
 
-            {/* Categories */}
-            <div className="space-y-2">
-              {orderedCategories.map((cat, index) => (
-                <CategoryRow
-                  key={cat.key}
-                  category={cat}
-                  index={index}
-                  totalCount={orderedCategories.length}
-                  isFixed={isFixedCategory(cat.key)}
-                  onInputChange={handleInputChange}
-                  onLabelChange={handleLabelChange}
-                  onMove={handleMoveCategory}
-                  onRemove={handleRemoveCategory}
-                />
-              ))}
-            </div>
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+              <SortableContext items={categoryOrder} strategy={verticalListSortingStrategy}>
+                <div className="space-y-2">
+                  {orderedCategories.map((cat) => (
+                    <CategoryRow
+                      key={cat.key}
+                      category={cat}
+                      isFixed={isFixedCategory(cat.key)}
+                      onInputChange={handleInputChange}
+                      onLabelChange={handleLabelChange}
+                      onRemove={handleRemoveCategory}
+                    />
+                  ))}
+                </div>
+              </SortableContext>
+            </DndContext>
           </div>
         )}
 
-        {/* Add Custom Category */}
         <AddCategoryInput
           value={newCategoryName}
           onChange={setNewCategoryName}
           onAdd={handleAddCategory}
         />
 
-        {/* Totals */}
         {orderedCategories.length > 0 && (
           <TotalsDisplay totalPlanned={totalPlanned} totalActual={totalActual} />
         )}

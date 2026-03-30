@@ -1,9 +1,23 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Receipt, Plus } from "lucide-react";
 import { EditableCostRow } from "./recurring-costs/EditableCostRow";
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  arrayMove,
+} from "@dnd-kit/sortable";
 
 interface RecurringCostsProps {
   data: {
@@ -18,6 +32,27 @@ export function RecurringCosts({ data }: RecurringCostsProps) {
   const { recurringCosts, addRecurringCost, updateRecurringCost, deleteRecurringCost } = data;
   const [newName, setNewName] = useState("");
   const [newAmount, setNewAmount] = useState("");
+  const [orderedCosts, setOrderedCosts] = useState(recurringCosts);
+
+  useEffect(() => {
+    setOrderedCosts(recurringCosts);
+  }, [recurringCosts]);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 150, tolerance: 5 } })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      setOrderedCosts((prev) => {
+        const oldIndex = prev.findIndex((i) => i.id === active.id);
+        const newIndex = prev.findIndex((i) => i.id === over.id);
+        return arrayMove(prev, oldIndex, newIndex);
+      });
+    }
+  };
 
   const handleAdd = async () => {
     if (!newName.trim() || !newAmount) return;
@@ -26,7 +61,7 @@ export function RecurringCosts({ data }: RecurringCostsProps) {
     setNewAmount("");
   };
 
-  const total = recurringCosts.reduce((sum, c) => sum + c.amount, 0);
+  const total = orderedCosts.reduce((sum, c) => sum + c.amount, 0);
 
   const formatCurrency = (value: number) =>
     new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
@@ -42,7 +77,6 @@ export function RecurringCosts({ data }: RecurringCostsProps) {
         </div>
       </CardHeader>
       <CardContent className="space-y-4 md:space-y-5 px-4 md:px-6">
-        {/* Add new cost - stacked on mobile */}
         <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
           <Input
             placeholder="Ex: Luz, Internet..."
@@ -72,24 +106,27 @@ export function RecurringCosts({ data }: RecurringCostsProps) {
           </div>
         </div>
 
-        {recurringCosts.length > 0 ? (
-          <div className="space-y-2">
-            {recurringCosts.map((cost) => (
-              <EditableCostRow
-                key={cost.id}
-                cost={cost}
-                onUpdate={updateRecurringCost}
-                onDelete={deleteRecurringCost}
-                formatCurrency={formatCurrency}
-              />
-            ))}
-            
-            {/* Total */}
-            <div className="flex items-center justify-between p-3 md:p-4 rounded-xl bg-accent/5 border border-accent/20 mt-3 md:mt-4">
-              <span className="font-display font-semibold text-sm md:text-base">Total Mensal</span>
-              <span className="font-display font-bold text-base md:text-lg text-accent">{formatCurrency(total)}</span>
-            </div>
-          </div>
+        {orderedCosts.length > 0 ? (
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+            <SortableContext items={orderedCosts.map((c) => c.id)} strategy={verticalListSortingStrategy}>
+              <div className="space-y-2">
+                {orderedCosts.map((cost) => (
+                  <EditableCostRow
+                    key={cost.id}
+                    cost={cost}
+                    onUpdate={updateRecurringCost}
+                    onDelete={deleteRecurringCost}
+                    formatCurrency={formatCurrency}
+                  />
+                ))}
+                
+                <div className="flex items-center justify-between p-3 md:p-4 rounded-xl bg-accent/5 border border-accent/20 mt-3 md:mt-4">
+                  <span className="font-display font-semibold text-sm md:text-base">Total Mensal</span>
+                  <span className="font-display font-bold text-base md:text-lg text-accent">{formatCurrency(total)}</span>
+                </div>
+              </div>
+            </SortableContext>
+          </DndContext>
         ) : (
           <div className="text-center py-8 md:py-12 text-muted-foreground">
             <Receipt className="w-10 h-10 md:w-12 md:h-12 mx-auto mb-2 md:mb-3 opacity-30" />
