@@ -248,6 +248,12 @@ export function useWeddingCalculator({ weddingCosts, saveAllWeddingCosts }: UseW
 
   const isFixedCategory = (key: string) => mode === 'presets' && FIXED_CATEGORY_KEYS.includes(key);
 
+  const handleReorderCategories = (newOrder: string[]) => {
+    setCategoryOrder(newOrder);
+    setHasChanges(true);
+    setJustSaved(false);
+  };
+
   return {
     mode,
     activeScenario,
@@ -268,6 +274,7 @@ export function useWeddingCalculator({ weddingCosts, saveAllWeddingCosts }: UseW
     handleAddCategory,
     handleRemoveCategory,
     handleMoveCategory,
+    handleReorderCategories,
     handleSave,
     isFixedCategory,
   };
