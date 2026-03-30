@@ -60,7 +60,7 @@ const Index = () => {
         <ProfileDropdown />
       </header>
 
-      <main className="relative px-3 py-4 md:p-6 lg:p-8 pb-32 md:pb-28 max-w-7xl mx-auto">
+      <main className="relative px-3 py-4 md:p-6 lg:p-8 pb-32 md:pb-28 max-w-7xl mx-auto overflow-x-hidden">
         <DashboardContent />
       </main>
 
