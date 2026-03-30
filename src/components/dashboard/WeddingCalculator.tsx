@@ -65,7 +65,7 @@ export function WeddingCalculator({ data }: WeddingCalculatorProps) {
   };
 
   return (
-    <Card className="border-0 shadow-lg shadow-primary/5 overflow-hidden">
+    <Card className="border-0 shadow-lg shadow-primary/5 overflow-hidden min-w-0">
       <CardHeader className="flex flex-col gap-3 pb-3 md:pb-4 px-4 md:px-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-2 md:gap-3">

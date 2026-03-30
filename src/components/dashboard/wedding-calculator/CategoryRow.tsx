@@ -56,7 +56,7 @@ export function CategoryRow({
     <div
       ref={setNodeRef}
       style={style}
-      className="p-3 md:p-2 rounded-xl bg-muted/30 border border-border/50 transition-colors"
+      className="p-3 md:p-2 rounded-xl bg-muted/30 border border-border/50 transition-colors min-w-0 overflow-hidden"
     >
       {/* Mobile layout */}
       <div className="flex flex-col gap-2 md:hidden">
