@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Legend } from "recharts";
 import { BarChart3 } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const FIXED_CATEGORY_LABELS: Record<string, string> = {
   cerimonia: "Cerimônia",
@@ -17,6 +18,8 @@ interface WeddingComparisonChartProps {
 }
 
 export function WeddingComparisonChart({ weddingCosts }: WeddingComparisonChartProps) {
+  const isMobile = useIsMobile();
+
   const chartData = weddingCosts.map((cost) => {
     const label = FIXED_CATEGORY_LABELS[cost.category] || cost.category;
     return {
@@ -44,16 +47,16 @@ export function WeddingComparisonChart({ weddingCosts }: WeddingComparisonChartP
 
   if (!hasData) {
     return (
-      <Card className="border-0 shadow-lg shadow-primary/5 overflow-hidden">
-        <CardHeader className="pb-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
+      <Card className="border-0 shadow-lg shadow-primary/5 overflow-hidden min-w-0">
+        <CardHeader className="pb-4 px-4 md:px-6">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center shrink-0">
               <BarChart3 className="w-5 h-5 text-primary" />
             </div>
             <CardTitle className="font-display text-xl">Planejado vs Real</CardTitle>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-4 md:px-6 min-w-0">
           <div className="text-center py-12 text-muted-foreground">
             <BarChart3 className="w-12 h-12 mx-auto mb-3 opacity-30" />
             <p>Adicione custos planejados e reais</p>
@@ -65,36 +68,41 @@ export function WeddingComparisonChart({ weddingCosts }: WeddingComparisonChartP
   }
 
   return (
-    <Card className="border-0 shadow-lg shadow-primary/5 overflow-hidden">
-      <CardHeader className="pb-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
+    <Card className="border-0 shadow-lg shadow-primary/5 overflow-hidden min-w-0">
+      <CardHeader className="pb-4 px-4 md:px-6">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center shrink-0">
             <BarChart3 className="w-5 h-5 text-primary" />
           </div>
           <CardTitle className="font-display text-xl">Planejado vs Real</CardTitle>
         </div>
       </CardHeader>
-      <CardContent>
-        <ChartContainer config={chartConfig} className="h-[300px] w-full">
+      <CardContent className="px-4 md:px-6 min-w-0 overflow-hidden">
+        <ChartContainer config={chartConfig} className="h-[280px] w-full min-w-0 md:h-[300px]">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+            <BarChart data={chartData} margin={{ top: 20, right: isMobile ? 8 : 20, left: isMobile ? -24 : 8, bottom: isMobile ? 24 : 8 }}>
               <XAxis 
                 dataKey="category" 
                 tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }} 
                 tickLine={false}
                 axisLine={false}
+                interval={0}
+                angle={isMobile ? -20 : 0}
+                textAnchor={isMobile ? 'end' : 'middle'}
+                height={isMobile ? 56 : 30}
               />
               <YAxis 
                 tickFormatter={(value) => `R$${(value / 1000).toFixed(0)}k`}
-                tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }}
+                tick={{ fontSize: isMobile ? 10 : 12, fill: 'hsl(var(--muted-foreground))' }}
                 tickLine={false}
                 axisLine={false}
+                width={isMobile ? 34 : 48}
               />
               <ChartTooltip
                 content={<ChartTooltipContent formatter={(value) => formatCurrency(Number(value))} />}
               />
               <Legend 
-                wrapperStyle={{ paddingTop: 20 }}
+                wrapperStyle={{ paddingTop: 20, fontSize: isMobile ? 12 : 14 }}
                 iconType="circle"
               />
               <Bar 

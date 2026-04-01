@@ -10,13 +10,13 @@ interface AddCategoryInputProps {
 
 export function AddCategoryInput({ value, onChange, onAdd }: AddCategoryInputProps) {
   return (
-    <div className="flex flex-col sm:flex-row gap-2">
+    <div className="flex min-w-0 flex-col gap-2 sm:flex-row">
       <Input
         placeholder="Nova categoria (ex: Lua de Mel)"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={(e) => e.key === "Enter" && onAdd()}
-        className="text-sm flex-1 h-11 rounded-xl border-border/50"
+        className="h-11 min-w-0 flex-1 rounded-xl border-border/50 text-sm"
       />
       <Button
         variant="outline"

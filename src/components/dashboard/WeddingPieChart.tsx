@@ -1,5 +1,4 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { PieChart as PieChartIcon } from "lucide-react";
 
@@ -13,14 +12,14 @@ const FIXED_CATEGORY_LABELS: Record<string, string> = {
 };
 
 const COLORS = [
-  "hsl(250, 60%, 55%)",  // Primary violet
-  "hsl(12, 80%, 60%)",   // Coral accent
-  "hsl(160, 70%, 42%)",  // Success green
-  "hsl(38, 92%, 50%)",   // Warning amber
-  "hsl(280, 65%, 55%)",  // Purple
-  "hsl(200, 80%, 55%)",  // Sky blue
-  "hsl(330, 70%, 55%)",  // Pink
-  "hsl(170, 60%, 45%)",  // Teal
+  "hsl(var(--chart-1))",
+  "hsl(var(--chart-2))",
+  "hsl(var(--chart-3))",
+  "hsl(var(--chart-4))",
+  "hsl(var(--chart-5))",
+  "hsl(var(--chart-6))",
+  "hsl(var(--primary))",
+  "hsl(var(--accent))",
 ];
 
 interface WeddingPieChartProps {
@@ -39,13 +38,6 @@ export function WeddingPieChart({ weddingCosts }: WeddingPieChartProps) {
     });
 
   const total = chartData.reduce((sum, item) => sum + item.value, 0);
-
-  const chartConfig = Object.fromEntries(
-    chartData.map((item, index) => [
-      item.name,
-      { label: item.name, color: COLORS[index % COLORS.length] },
-    ])
-  );
 
   const formatCurrency = (value: number) =>
     new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
@@ -76,7 +68,7 @@ export function WeddingPieChart({ weddingCosts }: WeddingPieChartProps) {
   }
 
   return (
-    <Card className="border-0 shadow-lg shadow-primary/5 overflow-hidden">
+    <Card className="border-0 shadow-lg shadow-primary/5 overflow-hidden min-w-0">
       <CardHeader className="pb-3 md:pb-4 px-4 md:px-6">
         <div className="flex items-center gap-2 md:gap-3">
           <div className="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-gradient-to-br from-accent/20 to-warning/20 flex items-center justify-center shrink-0">
@@ -88,10 +80,10 @@ export function WeddingPieChart({ weddingCosts }: WeddingPieChartProps) {
           </div>
         </div>
       </CardHeader>
-      <CardContent className="px-4 md:px-6">
-        <div className="flex flex-col lg:flex-row items-center gap-4 md:gap-6">
+      <CardContent className="px-4 md:px-6 min-w-0">
+        <div className="flex min-w-0 flex-col items-center gap-4 md:gap-6 lg:flex-row">
           {/* Chart */}
-          <div className="relative w-full lg:w-1/2 h-48 md:h-64">
+          <div className="relative h-48 w-full min-w-0 md:h-64 lg:w-1/2">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
@@ -136,14 +128,14 @@ export function WeddingPieChart({ weddingCosts }: WeddingPieChartProps) {
           </div>
 
           {/* Legend - horizontal scroll on mobile */}
-          <div className="w-full lg:w-1/2">
-            <div className="flex lg:grid lg:grid-cols-2 gap-2 overflow-x-auto lg:overflow-visible scrollbar-hide pb-2 lg:pb-0 -mx-1 px-1">
+          <div className="w-full min-w-0 lg:w-1/2">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
               {chartData.map((item, index) => {
                 const percent = ((item.value / total) * 100).toFixed(0);
                 return (
                   <div 
                     key={item.name}
-                    className="flex items-center gap-2 md:gap-3 p-2.5 md:p-3 rounded-xl bg-muted/30 border border-border/50 min-w-[140px] lg:min-w-0 shrink-0 lg:shrink"
+                    className="flex min-w-0 items-center gap-2 rounded-xl border border-border/50 bg-muted/30 p-2.5 md:gap-3 md:p-3"
                   >
                     <div 
                       className="w-3 h-3 md:w-4 md:h-4 rounded-full shrink-0"

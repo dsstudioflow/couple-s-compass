@@ -116,16 +116,16 @@ export function WeddingCalculator({ data }: WeddingCalculatorProps) {
         </Tabs>
       </CardHeader>
       
-      <CardContent className="space-y-4 md:space-y-5 px-4 md:px-6">
+      <CardContent className="space-y-4 md:space-y-5 px-4 md:px-6 min-w-0">
         {mode === 'presets' && (
-          <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1 -mx-1 px-1">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
             {(["economico", "padrao", "luxo"] as const).map((scenario) => (
               <Button
                 key={scenario}
                 variant={activeScenario === scenario ? "default" : "outline"}
                 size="sm"
                 onClick={() => handleScenario(scenario)}
-                className="rounded-xl shrink-0 text-xs md:text-sm"
+                className="w-full rounded-xl text-xs md:text-sm"
               >
                 {scenario === "economico" ? "💰 Econômico" : scenario === "padrao" ? "✨ Padrão" : "👑 Luxo"}
               </Button>
@@ -144,7 +144,7 @@ export function WeddingCalculator({ data }: WeddingCalculatorProps) {
         )}
         
         {orderedCategories.length > 0 && (
-          <div className="space-y-2">
+          <div className="space-y-2 min-w-0">
             <div className="hidden md:grid grid-cols-[auto_1fr_1fr_1fr_auto] gap-3 text-xs font-medium text-muted-foreground px-1">
               <span className="w-10"></span>
               <span>Categoria</span>
